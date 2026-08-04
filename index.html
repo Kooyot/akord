@@ -276,7 +276,7 @@
   </div>
   <div class="zakres-sum">
     <span class="et" id="zakres-et">Suma zakresu</span>
-    <span class="v" id="zakres-v">0,000 zł</span>
+    <span class="v" id="zakres-v">0,00 zł</span>
   </div>
 
   <div class="brew"><span class="znak">≡</span><h2>Dziennik</h2><i></i></div>
@@ -367,7 +367,7 @@
   <div class="pasek-in">
     <div class="suma">
       <div class="et" id="pasek-et">Do wyliczenia</div>
-      <div class="v" id="pasek-v">0,000 zł</div>
+      <div class="v" id="pasek-v">0,00 zł</div>
     </div>
     <button class="btn btn-glowny" id="btn-policz">Policz</button>
   </div>
@@ -386,6 +386,9 @@ const K_WPISY = "akord.tapicernia.v1";
 const K_CENNIK = "akord.cennik.v1";
 const K_CENNIK_STARY = "akord.cennik.odlozony";
 const CENNIK_DATA = "04.08.2026";   // data cennika wbudowanego wyzej
+
+/* tysieczne zlotego -> pelne grosze; uzywane wszedzie, gdzie liczymy pieniadze */
+const doGroszy = (t) => Math.round(t/10)*10;
 
 /* Czy ten adres pozwala nam cokolwiek zapamietac. Na Androidzie plik otwarty
    z listy pobranych dostaje adres content:// — origin nieprzezroczysty, gdzie
@@ -413,7 +416,7 @@ function czystWpis(w){
   if (typeof w.data !== "string" || !DATA_OK.test(w.data)) return null;
   if (typeof w.suma !== "number" || !Number.isFinite(w.suma)) return null;
   return {
-    id: w.id, data: w.data, suma: Math.round(w.suma),
+    id: w.id, data: w.data, suma: doGroszy(w.suma),
     rodzina: typeof w.rodzina === "string" && w.rodzina ? w.rodzina : "—",
     opis: typeof w.opis === "string" ? w.opis : "",
     pozycje: Array.isArray(w.pozycje) ? w.pozycje : []
@@ -501,10 +504,11 @@ function zapiszWpisy(){
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g,
   (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-/* Stawki w cenniku maja trzy miejsca po przecinku (tysieczne zlotego), wiec
-   kwoty pokazujemy tak samo. Przy zaokraglaniu do groszy suma pozycji nie
-   zgadzala sie z wierszem „Razem" — 6,549 + 2,495 wygladalo jak 6,55 + 2,50 = 9,04. */
-const zl = (t) => (t/1000).toLocaleString("pl-PL",{minimumFractionDigits:3,maximumFractionDigits:3}) + " zł";
+/* Stawki w cenniku maja trzy miejsca po przecinku, ale pieniadze pokazujemy w
+   groszach. Zeby suma pozycji zgadzala sie z wierszem „Razem", a suma wpisow
+   z naglowkiem dnia, zaokraglamy KAZDA kwote do grosza juz przy liczeniu —
+   nie dopiero przy wyswietlaniu. Wtedy kazdy poziom sumuje sie co do grosza. */
+const zl = (t) => (doGroszy(t)/1000).toLocaleString("pl-PL",{minimumFractionDigits:2,maximumFractionDigits:2}) + " zł";
 const zlKrotko = (t) => Math.round(t/1000).toLocaleString("pl-PL");
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const DNI = ["niedziela","poniedziałek","wtorek","środa","czwartek","piątek","sobota"];
@@ -835,7 +839,7 @@ function wierszBryly(kod, cena, zazn, ile, tryb){
        </div>` : "";
   let opis;
   if (cena === null) opis = `<span class="cena brak">tylko dodatki</span>`;
-  else if (cena === 0) opis = `<span class="cena zero">0,000 zł · bez opłaty</span>`;
+  else if (cena === 0) opis = `<span class="cena zero">0,00 zł · bez opłaty</span>`;
   else opis = `<span class="cena">${zl(cena)}</span>`;
   return `<div class="bryl ${zazn?"on":""}">
     <button class="hit" data-tryb="${tryb}" data-kod="${esc(kod)}">
@@ -888,9 +892,9 @@ function pozycje(){
   const out = [];
   for (const [kod,s] of Object.entries(wybor)){
     const b = mapa[kod]; if (!b) continue;
-    if (b[1] !== null) out.push({kod, op:"Tapicerowanie", skrot:"T", q:s.q, cena:b[1], kwota:b[1]*s.q});
-    if (s.p && b[2] !== null) out.push({kod, op:"Przygotowanie", skrot:"P", q:s.q, cena:b[2], kwota:b[2]*s.q});
-    if (s.w && b[3] !== null) out.push({kod, op:"Wypychanie poduszek", skrot:"W", q:s.q, cena:b[3], kwota:b[3]*s.q});
+    if (b[1] !== null) out.push({kod, op:"Tapicerowanie", skrot:"T", q:s.q, cena:b[1], kwota:doGroszy(b[1]*s.q)});
+    if (s.p && b[2] !== null) out.push({kod, op:"Przygotowanie", skrot:"P", q:s.q, cena:b[2], kwota:doGroszy(b[2]*s.q)});
+    if (s.w && b[3] !== null) out.push({kod, op:"Wypychanie poduszek", skrot:"W", q:s.q, cena:b[3], kwota:doGroszy(b[3]*s.q)});
   }
   return out;
 }

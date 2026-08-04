@@ -1,7 +1,7 @@
 /* Service worker — daje offline i przycisk „Zainstaluj”.
    Nawigacja: najpierw sieć, żeby po wgraniu nowej wersji od razu ją widzieć;
    gdy sieci nie ma — z kopii. Reszta: najpierw kopia, odświeżana w tle. */
-const CACHE = "akord-v5";
+const CACHE = "akord-v6";
 const PLIKI = ["./", "./index.html", "./manifest.json",
                "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"];
 
