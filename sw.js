@@ -1,8 +1,9 @@
 /* Service worker — daje offline i przycisk „Zainstaluj”.
    Nawigacja: najpierw sieć, żeby po wgraniu nowej wersji od razu ją widzieć;
    gdy sieci nie ma — z kopii. Reszta: najpierw kopia, odświeżana w tle. */
-const CACHE = "akord-v4";
-const PLIKI = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
+const CACHE = "akord-v5";
+const PLIKI = ["./", "./index.html", "./manifest.json",
+               "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE)
@@ -36,7 +37,10 @@ self.addEventListener("fetch", (e) => {
       const zsieci = fetch(req).then((r) => { const k = r.clone();
         caches.open(CACHE).then((c) => c.put(req, k)).catch(() => {});
         return r; });
-      return kopia || zsieci;
+      /* Przy trafieniu w kopie odswiezenie leci w tle — bez tego catch offline
+         sypie nieobsluzonym odrzuceniem w konsoli service workera. */
+      if (kopia){ zsieci.catch(() => {}); return kopia; }
+      return zsieci;
     })
   );
 });
