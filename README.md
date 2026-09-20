@@ -1,38 +1,17 @@
-# Akord — kalkulator tapicerski
+# Akord — wersja GitHub Pages
 
-Aplikacja do liczenia akordu w tapicerni. Wbudowany cennik: 160 mebli, 4126 bryl (stan 04.08.2026).
-Dziennik zarobkow z datami i sumami za dowolny okres. Edytor cennika w aplikacji.
+Wgraj wszystkie pliki z tego katalogu do głównego katalogu repozytorium GitHub Pages.
 
-Dziala w calosci w przegladarce — dane leza w pamieci telefonu, nic nie wychodzi
-na serwer. Po pierwszym otwarciu dziala bez zasiegu.
+## Uwaga o ikonach
 
-## Instalacja na telefonie
+Pliki źródłowe ikon są obecnie w formacie JPG. Przed publikacją przekonwertuj je do prawdziwych plików PNG i nazwij:
 
-Otworz adres w Chrome i wybierz **Zainstaluj aplikacje** (albo menu `⋮` →
-**Dodaj do ekranu glownego**). Na iPhonie: **Udostepnij** → **Do ekranu poczatkowego**.
+- icon-192.png
+- icon-512.png
+- icon-maskable-512.png
 
-## Pliki
-
-| plik | rola |
-|---|---|
-| `index.html` | cala aplikacja z cennikiem w srodku |
-| `manifest.json` | nazwa, ikony, tryb pelnoekranowy |
-| `sw.js` | service worker: offline i przycisk instalacji |
-| `icon-192.png`, `icon-512.png` | ikony na ekran glowny |
-| `icon-maskable-512.png` | ikona maskable (Android obcina ja do kola) |
+Nie zmieniaj samego rozszerzenia JPG na PNG bez konwersji.
 
 ## Aktualizacja cennika
 
-1. w `index.html` podmien JSON w `<script id="dane">`
-2. ustaw `CENNIK_DATA` na date nowego cennika
-3. podbij `CACHE` w `sw.js`
-
-Zapisany na telefonie wlasny cennik nosi date bazy, na ktorej powstal. Gdy
-`CENNIK_DATA` sie zmieni, aplikacja przechodzi na nowy cennik wbudowany, a
-poprzednia wersje odklada pod klucz `akord.cennik.odlozony` i proponuje jej
-zapis. Dziennik zarobkow nie jest przy tym ruszany.
-
-Nowy `index.html` wchodzi sam po ponownym otwarciu aplikacji — nawigacja
-pyta najpierw siec, a kopii z cache uzywa tylko bez zasiegu. `WERSJA`
-w `_buduj_pwa.py` podbijaj przy zmianie ikon albo manifestu, albo zeby
-wymusic zupelnie czysty cache.
+Podmień tylko `cennik.json`. Przy większej aktualizacji zwiększ numer `CACHE` w `sw.js`, np. z `akord-v1` na `akord-v2`.
