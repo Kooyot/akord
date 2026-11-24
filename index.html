@@ -245,6 +245,13 @@
          border-radius:var(--r);padding:13px 14px;margin:14px 0 0;font-size:13.5px;line-height:1.6}
   .alarm b{color:var(--rdza)}
   .alarm .btn{margin-top:11px}
+  .nowosc{background:var(--akcent-tlo);border:1px solid var(--akcent);border-left:4px solid var(--akcent);
+          border-radius:var(--r);padding:13px 14px;margin:14px 0 0;font-size:13.5px;line-height:1.6}
+  .nowosc b{color:var(--akcent)}
+  .nowosc ul{margin:6px 0 0;padding-left:18px}
+  .nowosc li{font-variant-numeric:tabular-nums}
+  .nowosc .cena{white-space:nowrap}
+  .nowosc .btn{margin-top:11px}
 </style>
 
 <header>
@@ -256,6 +263,7 @@
 
 <!-- ============ GLOWNY ============ -->
 <main id="ekran-glowny" class="owijka">
+  <div id="info-aktualizacja"></div>
   <div id="alarm-pamiec"></div>
   <div class="brew"><span class="znak">Σ</span><h2>Zarobek</h2><i></i></div>
   <div class="kafle">
@@ -389,7 +397,8 @@ const BAZA = JSON.parse(document.getElementById("dane").textContent);
 const K_WPISY = "akord.tapicernia.v1";
 const K_CENNIK = "akord.cennik.v1";
 const K_CENNIK_STARY = "akord.cennik.odlozony";
-const K_FIRMOWY = "akord.cennik.zewnetrzny";   // ostatni cennik firmowy pobrany z sieci
+const K_FIRMOWY = "akord.cennik.zewnetrzny";
+const K_AKTUALIZACJA = "akord.cennik.aktualizacja";   // co zmienil ostatnio pobrany cennik   // ostatni cennik firmowy pobrany z sieci
 const CENNIK_DATA = "10.11.2026";   // tylko na zapas — prawdziwa data przychodzi z cennik.json
 
 /* tysieczne zlotego -> pelne grosze; uzywane wszedzie, gdzie liczymy pieniadze */
@@ -481,6 +490,43 @@ function wczytajFirmowy(){
   FIRMOWY = f.dane; DATA_CENNIKA = f.baza;
 }
 const kopiaFirmowego = () => JSON.parse(JSON.stringify(FIRMOWY));
+
+/* Przyszedl cennik z sieci — porownujemy go z poprzednim cennikiem firmowym
+   z pamieci telefonu, zanim go nadpiszemy. Roznice odkladamy, a ramka na
+   ekranie glownym pokazuje je, dopoki ktos nie kliknie „OK" — zeby nie
+   przepadly, gdy aplikacja zostanie zamknieta przed przeczytaniem.
+   Bez poprzedniego cennika (pierwsze uruchomienie) nie ma czego ogłaszac. */
+function zanotujAktualizacje(nowy){
+  let stary = null;
+  try{
+    const s = JSON.parse(localStorage.getItem(K_FIRMOWY) || "null");
+    const c = s && czystCennik(s.dane);
+    if (c) stary = {baza: typeof s.baza === "string" ? s.baza : "", dane: c};
+  }catch(e){}
+  if (!stary) return;
+  const plaski = (d) => {
+    const m = new Map();
+    for (const lista of Object.values(d)) for (const b of lista) m.set(b[0], b.slice(1,4));
+    return m;
+  };
+  const a = plaski(stary.dane), b = plaski(nowy.dane);
+  let dodane = 0, usuniete = 0;
+  const zmiany = [];
+  for (const [kod, v] of b){
+    const s = a.get(kod);
+    if (!s){ dodane++; continue; }
+    const i = [0,1,2].find(i => s[i] !== v[i]);
+    if (i !== undefined) zmiany.push([kod, i, s[i], v[i]]);
+  }
+  for (const kod of a.keys()) if (!b.has(kod)) usuniete++;
+  if (!dodane && !usuniete && !zmiany.length && stary.baza === nowy.baza) return;
+  const info = {
+    z: stary.baza, na: nowy.baza, dodane, usuniete, zmienione: zmiany.length,
+    noweMeble: Object.keys(nowy.dane).filter(m => !stary.dane[m]).sort(),
+    przyklady: zmiany.slice(0, 5)
+  };
+  try{ localStorage.setItem(K_AKTUALIZACJA, JSON.stringify(info)); }catch(e){}
+}
 
 /* Zapisany recznie cennik nosi date cennika firmowego, na ktorym powstal.
    Ta sama data — liczymy z wersji uzytkownika. Inna, bo przyszedl nowy
@@ -809,9 +855,64 @@ function rysujAlarmPamieci(){
 }
 
 function odswiezWszystko(){
+  rysujAktualizacje();
   odswiezKafle(); odswiezZakres(); odswiezDziennik();
   odswiezStanCennika(); rysujAlarmPamieci();
 }
+
+/* Ramka „cennik zaktualizowany". Zapis mogl sie uszkodzic albo pochodzic
+   z innej wersji — kazde pole sprawdzamy, zanim cos z nim zrobimy. */
+const OPERACJE_NAZWY = ["tapicerowanie", "przygotowanie", "wypychanie"];
+function rysujAktualizacje(){
+  const box = $("info-aktualizacja");
+  let a = null;
+  try{ a = JSON.parse(localStorage.getItem(K_AKTUALIZACJA) || "null"); }catch(e){}
+  if (!a || typeof a !== "object" || Array.isArray(a)){ box.innerHTML = ""; return; }
+  const ile = (x) => Number.isFinite(x) && x > 0 ? Math.round(x) : 0;
+  const data = (x) => typeof x === "string" && x ? esc(x) : "";
+  const dod = ile(a.dodane), usu = ile(a.usuniete), zm = ile(a.zmienione);
+
+  const z = data(a.z), na = data(a.na);
+  /* bez daty nowego cennika zapis jest uszkodzony — lepiej nic nie mowic,
+     niz twierdzic na przyklad, ze zadna cena sie nie zmienila */
+  if (!na){
+    try{ localStorage.removeItem(K_AKTUALIZACJA); }catch(e){}
+    box.innerHTML = ""; return;
+  }
+  const kiedy = z && na !== z ? ` — teraz z ${na} (wcześniej ${z})` : ` — z ${na}`;
+  const czesci = [];
+  if (dod) czesci.push(`${dod} ${odm(dod,"nowa bryła","nowe bryły","nowych brył")}`);
+  if (usu) czesci.push(`${usu} ${odm(usu,"bryła usunięta","bryły usunięte","brył usuniętych")}`);
+  const ilosci = czesci.length ? czesci.join(", ") + ". " : "";
+  const ceny = zm
+    ? `<b>Zmieniły się ceny ${zm} ${odm(zm,"bryły","brył","brył")}.</b>`
+    : "Żadna cena się nie zmieniła.";
+
+  const meble = Array.isArray(a.noweMeble) ? a.noweMeble.filter(m => typeof m === "string") : [];
+  const POKAZ = 8;
+  const nowe = meble.length
+    ? `<br>${odm(meble.length,"Nowy mebel","Nowe meble","Nowe meble")}: ${meble.slice(0,POKAZ).map(esc).join(", ")}`
+      + (meble.length > POKAZ ? ` i ${meble.length-POKAZ} ${odm(meble.length-POKAZ,"inny","inne","innych")}` : "") + "."
+    : "";
+
+  const cena = (v) => `<span class="cena">${Number.isFinite(v) ? zl(v) : "—"}</span>`;
+  const przyk = (Array.isArray(a.przyklady) ? a.przyklady : [])
+    .filter(p => Array.isArray(p) && p.length === 4 && typeof p[0] === "string")
+    .map(p => `<li>${esc(p[0])}${OPERACJE_NAZWY[p[1]] ? ` (${OPERACJE_NAZWY[p[1]]})` : ""}: `
+      + `${cena(p[2])} → ${cena(p[3])}</li>`);
+  const lista = przyk.length
+    ? `<ul>${przyk.join("")}</ul>` + (zm > przyk.length ? `<div class="hint">…i ${zm-przyk.length} więcej.</div>` : "")
+    : "";
+
+  box.innerHTML = `<div class="nowosc" role="status"><b>Cennik zaktualizowany</b>${kiedy}.<br>
+    ${ilosci}${ceny}${nowe}${lista}
+    <button class="btn btn-blok" id="btn-aktualizacja-ok">OK</button></div>`;
+}
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#btn-aktualizacja-ok")) return;
+  try{ localStorage.removeItem(K_AKTUALIZACJA); }catch(err){}
+  rysujAktualizacje();
+});
 
 $("dziennik").addEventListener("click", async (e) => {
   const b = e.target.closest("[data-usun]"); if (!b) return;
@@ -1370,6 +1471,7 @@ function pokazInstal(){
   (async function startAplikacji(){
 const zewnetrzny = await pobierzCennikZSieci();
 if (zewnetrzny){
+  zanotujAktualizacje(zewnetrzny);
   firmowyZSesji = zewnetrzny;
   try{ localStorage.setItem(K_FIRMOWY, JSON.stringify({wersja:1, baza:zewnetrzny.baza, dane:zewnetrzny.dane})); }catch(e){}
 }
