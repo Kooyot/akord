@@ -724,6 +724,7 @@ function odswiezDziennik(){
   }).join("");
 }
 function odswiezStanCennika(){
+  if (!CENNIK) return;   // cennik jeszcze sie pobiera — start wola nas, zanim przyjda dane
   const il = Object.keys(CENNIK).length;
   const ostrzezenie = cennikNiezapisany
     ? `<div class="alarm"><b>Zmiana w cenniku nie została zapisana.</b>
