@@ -248,9 +248,6 @@
   .nowosc{background:var(--akcent-tlo);border:1px solid var(--akcent);border-left:4px solid var(--akcent);
           border-radius:var(--r);padding:13px 14px;margin:14px 0 0;font-size:13.5px;line-height:1.6}
   .nowosc b{color:var(--akcent)}
-  .nowosc ul{margin:6px 0 0;padding-left:18px}
-  .nowosc li{font-variant-numeric:tabular-nums}
-  .nowosc .cena{white-space:nowrap}
   .nowosc .btn{margin-top:11px}
 </style>
 
@@ -510,21 +507,15 @@ function zanotujAktualizacje(nowy){
     return m;
   };
   const a = plaski(stary.dane), b = plaski(nowy.dane);
-  let dodane = 0, usuniete = 0;
-  const zmiany = [];
+  let dodane = 0, usuniete = 0, zmienione = 0;
   for (const [kod, v] of b){
     const s = a.get(kod);
     if (!s){ dodane++; continue; }
-    const i = [0,1,2].find(i => s[i] !== v[i]);
-    if (i !== undefined) zmiany.push([kod, i, s[i], v[i]]);
+    if (s.some((x, i) => x !== v[i])) zmienione++;
   }
   for (const kod of a.keys()) if (!b.has(kod)) usuniete++;
-  if (!dodane && !usuniete && !zmiany.length && stary.baza === nowy.baza) return;
-  const info = {
-    z: stary.baza, na: nowy.baza, dodane, usuniete, zmienione: zmiany.length,
-    noweMeble: Object.keys(nowy.dane).filter(m => !stary.dane[m]).sort(),
-    przyklady: zmiany.slice(0, 5)
-  };
+  if (!dodane && !usuniete && !zmienione && stary.baza === nowy.baza) return;
+  const info = {dodane, zmienione};
   try{ localStorage.setItem(K_AKTUALIZACJA, JSON.stringify(info)); }catch(e){}
 }
 
@@ -860,52 +851,25 @@ function odswiezWszystko(){
   odswiezStanCennika(); rysujAlarmPamieci();
 }
 
-/* Ramka „cennik zaktualizowany". Zapis mogl sie uszkodzic albo pochodzic
-   z innej wersji — kazde pole sprawdzamy, zanim cos z nim zrobimy. */
-const OPERACJE_NAZWY = ["tapicerowanie", "przygotowanie", "wypychanie"];
+/* Ramka „Cennik zaktualizowany": nowe bryly i czy zmienily sie ceny.
+   Zapis mogl sie uszkodzic — wtedy nic nie pokazujemy, zeby nie podac
+   nieprawdy (np. „ceny bez zmian"). */
 function rysujAktualizacje(){
   const box = $("info-aktualizacja");
   let a = null;
   try{ a = JSON.parse(localStorage.getItem(K_AKTUALIZACJA) || "null"); }catch(e){}
-  if (!a || typeof a !== "object" || Array.isArray(a)){ box.innerHTML = ""; return; }
-  const ile = (x) => Number.isFinite(x) && x > 0 ? Math.round(x) : 0;
-  const data = (x) => typeof x === "string" && x ? esc(x) : "";
-  const dod = ile(a.dodane), usu = ile(a.usuniete), zm = ile(a.zmienione);
-
-  const z = data(a.z), na = data(a.na);
-  /* bez daty nowego cennika zapis jest uszkodzony — lepiej nic nie mowic,
-     niz twierdzic na przyklad, ze zadna cena sie nie zmienila */
-  if (!na){
-    try{ localStorage.removeItem(K_AKTUALIZACJA); }catch(e){}
+  const ok = (x) => Number.isInteger(x) && x >= 0;
+  if (!a || !ok(a.dodane) || !ok(a.zmienione)){
+    if (a){ try{ localStorage.removeItem(K_AKTUALIZACJA); }catch(e){} }
     box.innerHTML = ""; return;
   }
-  const kiedy = z && na !== z ? ` — teraz z ${na} (wcześniej ${z})` : ` — z ${na}`;
-  const czesci = [];
-  if (dod) czesci.push(`${dod} ${odm(dod,"nowa bryła","nowe bryły","nowych brył")}`);
-  if (usu) czesci.push(`${usu} ${odm(usu,"bryła usunięta","bryły usunięte","brył usuniętych")}`);
-  const ilosci = czesci.length ? czesci.join(", ") + ". " : "";
-  const ceny = zm
-    ? `<b>Zmieniły się ceny ${zm} ${odm(zm,"bryły","brył","brył")}.</b>`
-    : "Żadna cena się nie zmieniła.";
-
-  const meble = Array.isArray(a.noweMeble) ? a.noweMeble.filter(m => typeof m === "string") : [];
-  const POKAZ = 8;
-  const nowe = meble.length
-    ? `<br>${odm(meble.length,"Nowy mebel","Nowe meble","Nowe meble")}: ${meble.slice(0,POKAZ).map(esc).join(", ")}`
-      + (meble.length > POKAZ ? ` i ${meble.length-POKAZ} ${odm(meble.length-POKAZ,"inny","inne","innych")}` : "") + "."
-    : "";
-
-  const cena = (v) => `<span class="cena">${Number.isFinite(v) ? zl(v) : "—"}</span>`;
-  const przyk = (Array.isArray(a.przyklady) ? a.przyklady : [])
-    .filter(p => Array.isArray(p) && p.length === 4 && typeof p[0] === "string")
-    .map(p => `<li>${esc(p[0])}${OPERACJE_NAZWY[p[1]] ? ` (${OPERACJE_NAZWY[p[1]]})` : ""}: `
-      + `${cena(p[2])} → ${cena(p[3])}</li>`);
-  const lista = przyk.length
-    ? `<ul>${przyk.join("")}</ul>` + (zm > przyk.length ? `<div class="hint">…i ${zm-przyk.length} więcej.</div>` : "")
-    : "";
-
-  box.innerHTML = `<div class="nowosc" role="status"><b>Cennik zaktualizowany</b>${kiedy}.<br>
-    ${ilosci}${ceny}${nowe}${lista}
+  const ceny = a.zmienione
+    ? `<b>Zmiany cen: ${a.zmienione} ${odm(a.zmienione,"bryła","bryły","brył")}</b>`
+    : "Ceny bez zmian";
+  box.innerHTML = `<div class="nowosc" role="status">
+    <b>Cennik zaktualizowany</b><br>
+    Nowe bryły: ${a.dodane}<br>
+    ${ceny}
     <button class="btn btn-blok" id="btn-aktualizacja-ok">OK</button></div>`;
 }
 document.addEventListener("click", (e) => {
