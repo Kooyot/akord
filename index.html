@@ -381,12 +381,16 @@
 "use strict";
 
 /* ================= dane ================= */
-const CENNIK_URL = "./cennik.json";
+/* Na stronie bierzemy cennik obok aplikacji. Z pobranego pliku (file://,
+   content://) adres wzgledny nie dziala — wtedy prosto ze strony. */
+const CENNIK_URL = /^https?:$/.test(location.protocol)
+  ? "./cennik.json" : "https://kooyot.github.io/akord/cennik.json";
 const BAZA = JSON.parse(document.getElementById("dane").textContent);
 const K_WPISY = "akord.tapicernia.v1";
 const K_CENNIK = "akord.cennik.v1";
 const K_CENNIK_STARY = "akord.cennik.odlozony";
-const CENNIK_DATA = "10.11.2026";   // data cennika wbudowanego wyzej
+const K_FIRMOWY = "akord.cennik.zewnetrzny";   // ostatni cennik firmowy pobrany z sieci
+const CENNIK_DATA = "10.11.2026";   // tylko na zapas — prawdziwa data przychodzi z cennik.json
 
 /* tysieczne zlotego -> pelne grosze; uzywane wszedzie, gdzie liczymy pieniadze */
 const doGroszy = (t) => Math.round(t/10)*10;
@@ -459,24 +463,44 @@ return {dane,baza:typeof pakiet.baza==="string"?pakiet.baza:CENNIK_DATA};
 let CENNIK = null, RODZINY = [], cennikWlasny = false, cennikNiezapisany = false;
 let cennikOdlozony = null;   // ile mebli ma odlozona wersja, albo null
 
-/* Zapisany cennik nosi date bazy, na ktorej powstal. Gdy wgrywamy nowy cennik
-   firmowy, stary zapis przestaje pasowac — bierzemy wbudowany, a poprzedni
-   odkladamy pod osobny klucz, zeby reczne dopiski nie znikly bez sladu.
-   Dzieki temu po wgraniu plikow wszystko dziala od razu, bez klikania. */
+/* Cennik firmowy to ostatni cennik.json, ktory udalo sie pobrac. Trzymamy go
+   w pamieci telefonu, wiec bez zasiegu aplikacja liczy z ostatniej wersji,
+   a nie z pustego. Data przychodzi razem z cennikiem — przy aktualizacji
+   wystarczy podmienic cennik.json, aplikacji nie trzeba ruszac. */
+let FIRMOWY = {}, DATA_CENNIKA = CENNIK_DATA, firmowyZSesji = null;
+function wczytajFirmowy(){
+  let f = firmowyZSesji;
+  if (!f){
+    try{
+      const s = JSON.parse(localStorage.getItem(K_FIRMOWY) || "null");
+      const c = s && czystCennik(s.dane);
+      if (c) f = {dane:c, baza: typeof s.baza === "string" ? s.baza : CENNIK_DATA};
+    }catch(e){}
+  }
+  if (!f) f = {dane: czystCennik(BAZA) || {}, baza: CENNIK_DATA};
+  FIRMOWY = f.dane; DATA_CENNIKA = f.baza;
+}
+const kopiaFirmowego = () => JSON.parse(JSON.stringify(FIRMOWY));
+
+/* Zapisany recznie cennik nosi date cennika firmowego, na ktorym powstal.
+   Ta sama data — liczymy z wersji uzytkownika. Inna, bo przyszedl nowy
+   cennik firmowy — bierzemy nowy, a poprzedni odkladamy pod osobny klucz,
+   zeby reczne dopiski nie znikly bez sladu. Tak samo z siecia i bez. */
 function wczytajCennik(){
+  wczytajFirmowy();
   try{
     const surowy = localStorage.getItem(K_CENNIK);
     const s = JSON.parse(surowy || "null");
     const c = s && czystCennik(s.dane);
     if (c){
-      if (s.baza === CENNIK_DATA){
+      if (s.baza === DATA_CENNIKA){
         CENNIK = c; cennikWlasny = true; przeliczRodziny(); sprawdzOdlozony(); return;
       }
       try{ localStorage.setItem(K_CENNIK_STARY, surowy); }catch(e){}
       try{ localStorage.removeItem(K_CENNIK); }catch(e){}
     }
   }catch(e){}
-  CENNIK = JSON.parse(JSON.stringify(BAZA)); cennikWlasny = false;
+  CENNIK = kopiaFirmowego(); cennikWlasny = false;
   przeliczRodziny(); sprawdzOdlozony();
 }
 function sprawdzOdlozony(){
@@ -492,7 +516,7 @@ function przeliczRodziny(){ RODZINY = Object.keys(CENNIK).sort(); }
    „cennik zmieniony", choc w pamieci nic nie wyladowalo. */
 function zapiszCennik(){
   try{
-    localStorage.setItem(K_CENNIK, JSON.stringify({wersja:1, baza:CENNIK_DATA, dane:CENNIK}));
+    localStorage.setItem(K_CENNIK, JSON.stringify({wersja:1, baza:DATA_CENNIKA, dane:CENNIK}));
     cennikWlasny = true; cennikNiezapisany = false;
   }catch(e){
     cennikNiezapisany = true;
@@ -500,7 +524,7 @@ function zapiszCennik(){
   }
 }
 function przywrocCennik(){
-  CENNIK = JSON.parse(JSON.stringify(BAZA)); cennikWlasny = false; cennikNiezapisany = false;
+  CENNIK = kopiaFirmowego(); cennikWlasny = false; cennikNiezapisany = false;
   try{ localStorage.removeItem(K_CENNIK); }catch(e){}
   przeliczRodziny();
 }
@@ -732,7 +756,7 @@ function odswiezStanCennika(){
        Zrób kopię danych i zwolnij miejsce.</div>`
     : "";
   const odlozony = cennikOdlozony
-    ? `<div class="alarm"><b>Wgrany jest nowy cennik firmowy z ${CENNIK_DATA}.</b>
+    ? `<div class="alarm"><b>Wgrany jest nowy cennik firmowy z ${DATA_CENNIKA}.</b>
        Aplikacja liczy już z niego. Twoja poprzednia, ręcznie zmieniana wersja
        (${cennikOdlozony} ${odm(cennikOdlozony,"mebel","meble","mebli")}) została odłożona —
        jeśli miałeś w niej własne dopiski, zapisz ją u siebie, zanim usuniesz.
@@ -742,9 +766,12 @@ function odswiezStanCennika(){
   $("cennik-stan").innerHTML = ostrzezenie + odlozony + (cennikWlasny
     ? `<div class="zmieniony"><span class="znak">!</span>
        <div>Cennik jest zmieniony ręcznie — aplikacja liczy z Twojej wersji,
-       nie z wbudowanej. ${il} ${odm(il,"mebel","meble","mebli")}.</div></div>`
-    : `<p class="info">Wbudowany cennik z ${CENNIK_DATA} —
-       ${il} mebli, ${liczKody()} brył. Nietknięty.</p>`);
+       nie z firmowej. ${il} ${odm(il,"mebel","meble","mebli")}.</div></div>`
+    : il
+      ? `<p class="info">Cennik firmowy z ${DATA_CENNIKA} —
+       ${il} mebli, ${liczKody()} brył. Nietknięty.</p>`
+      : `<div class="alarm"><b>Cennik jeszcze się nie pobrał.</b>
+       Otwórz aplikację raz z internetem — potem działa też bez zasięgu.</div>`);
 }
 const liczKody = () => Object.values(CENNIK).reduce((s,v)=>s+v.length,0);
 
@@ -963,13 +990,13 @@ function rysujCennik(){
   $("c-stan").innerHTML = cennikWlasny
     ? `<div class="zmieniony"><span class="znak">!</span><div>Cennik zmieniony ręcznie.
        <button class="btn btn-groza btn-blok" id="btn-fabryczny"
-         style="margin-top:9px">Przywróć wbudowany cennik</button></div></div>`
+         style="margin-top:9px">Przywróć cennik firmowy</button></div></div>`
     : "";
   if ($("btn-fabryczny")) $("btn-fabryczny").onclick = async () => {
-    if (!await potwierdz("Przywrócić wbudowany cennik?",
+    if (!await potwierdz("Przywrócić cennik firmowy?",
       "Wszystkie Twoje zmiany w cennniku — dodane meble, bryły i poprawione ceny — przepadną. "+
       "Dziennik zarobków zostaje nietknięty.", "Przywróć", true)) return;
-    przywrocCennik(); rysujCennik(); odswiezStanCennika(); powiedz("Przywrócono wbudowany cennik");
+    przywrocCennik(); rysujCennik(); odswiezStanCennika(); powiedz("Przywrócono cennik firmowy");
   };
   rysujListeMebli();
 }
@@ -1341,15 +1368,10 @@ function pokazInstal(){
 /* ================= start ================= */
 (function(){
   (async function startAplikacji(){
-const zewnetrzny=await pobierzCennikZSieci();
-if(zewnetrzny){
-CENNIK=zewnetrzny.dane;
-cennikWlasny=false;
-cennikNiezapisany=false;
-przeliczRodziny();
-try{localStorage.setItem("akord.cennik.zewnetrzny",JSON.stringify({wersja:1,baza:zewnetrzny.baza,dane:CENNIK}));}catch{}
-odswiezWszystko();
-return;
+const zewnetrzny = await pobierzCennikZSieci();
+if (zewnetrzny){
+  firmowyZSesji = zewnetrzny;
+  try{ localStorage.setItem(K_FIRMOWY, JSON.stringify({wersja:1, baza:zewnetrzny.baza, dane:zewnetrzny.dane})); }catch(e){}
 }
 wczytajCennik();
 odswiezWszystko();
