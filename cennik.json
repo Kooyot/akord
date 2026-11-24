@@ -1,7 +1,7 @@
 {
   "wersja": 2,
-  "baza": "04.09.2026",
-  "zrodlo": "CENNIK-TAPICERNIA-04.09.2026-1.xls",
+  "baza": "10.11.2026",
+  "zrodlo": "CENNIK 10.11.2026.xls",
   "jednostka": "tysięczne złotego",
   "uwaga": "Dla powtórzonych symboli i operacji zastosowano ostatnią wartość z arkusza.",
   "dane": {
@@ -46,6 +46,12 @@
         "ACAPULCO-2BB",
         32296,
         4366,
+        null
+      ],
+      [
+        "ACAPULCO-2FM",
+        70113,
+        14757,
         null
       ],
       [
@@ -2387,6 +2393,12 @@
         null
       ],
       [
+        "ARPINO-HOCKERBANK",
+        13642,
+        null,
+        null
+      ],
+      [
         "ARPINO-OTTL",
         42299,
         null,
@@ -3712,6 +3724,224 @@
       ],
       [
         "BERGEN-OTTR",
+        30758,
+        null,
+        null
+      ]
+    ],
+    "BETTY": [
+      [
+        "BETTY-1",
+        23787,
+        null,
+        null
+      ],
+      [
+        "BETTY-1BB",
+        16533,
+        null,
+        null
+      ],
+      [
+        "BETTY-1L",
+        20160,
+        null,
+        null
+      ],
+      [
+        "BETTY-1MAL",
+        46978,
+        null,
+        null
+      ],
+      [
+        "BETTY-1MAR",
+        46978,
+        null,
+        null
+      ],
+      [
+        "BETTY-1OTTL",
+        35393,
+        null,
+        null
+      ],
+      [
+        "BETTY-1OTTR",
+        35393,
+        null,
+        null
+      ],
+      [
+        "BETTY-1R",
+        20160,
+        null,
+        null
+      ],
+      [
+        "BETTY-1_5BB",
+        24877,
+        null,
+        null
+      ],
+      [
+        "BETTY-1_5L",
+        28504,
+        null,
+        null
+      ],
+      [
+        "BETTY-1_5R",
+        28504,
+        null,
+        null
+      ],
+      [
+        "BETTY-2BB",
+        30363,
+        null,
+        null
+      ],
+      [
+        "BETTY-2L",
+        33990,
+        null,
+        null
+      ],
+      [
+        "BETTY-2MAL",
+        62788,
+        null,
+        null
+      ],
+      [
+        "BETTY-2MAR",
+        62788,
+        null,
+        null
+      ],
+      [
+        "BETTY-2OTTL",
+        45065,
+        null,
+        null
+      ],
+      [
+        "BETTY-2OTTR",
+        45065,
+        null,
+        null
+      ],
+      [
+        "BETTY-2R",
+        33990,
+        null,
+        null
+      ],
+      [
+        "BETTY-3",
+        49192,
+        null,
+        null
+      ],
+      [
+        "BETTY-3BB",
+        37413,
+        null,
+        null
+      ],
+      [
+        "BETTY-3L",
+        41040,
+        null,
+        null
+      ],
+      [
+        "BETTY-3MAL",
+        72451,
+        null,
+        null
+      ],
+      [
+        "BETTY-3MAR",
+        72451,
+        null,
+        null
+      ],
+      [
+        "BETTY-3ML",
+        76078,
+        null,
+        null
+      ],
+      [
+        "BETTY-3MR",
+        76078,
+        null,
+        null
+      ],
+      [
+        "BETTY-3R",
+        41040,
+        null,
+        null
+      ],
+      [
+        "BETTY-E",
+        31796,
+        null,
+        null
+      ],
+      [
+        "BETTY-HOCKER",
+        9358,
+        null,
+        null
+      ],
+      [
+        "BETTY-HOCKER_RUND",
+        9358,
+        null,
+        null
+      ],
+      [
+        "BETTY-KS",
+        1659,
+        null,
+        null
+      ],
+      [
+        "BETTY-KS70",
+        3768,
+        null,
+        null
+      ],
+      [
+        "BETTY-KSP",
+        1659,
+        null,
+        null
+      ],
+      [
+        "BETTY-OTRUNDL",
+        23631,
+        null,
+        null
+      ],
+      [
+        "BETTY-OTRUNDR",
+        23631,
+        null,
+        null
+      ],
+      [
+        "BETTY-OTTL",
+        30758,
+        null,
+        null
+      ],
+      [
+        "BETTY-OTTR",
         30758,
         null,
         null
@@ -5495,6 +5725,18 @@
         2081,
         null,
         null
+      ],
+      [
+        "CRACO-OTTL",
+        30048,
+        null,
+        1048
+      ],
+      [
+        "CRACO-OTTR",
+        30048,
+        null,
+        1048
       ]
     ],
     "DANNY": [
@@ -9891,6 +10133,12 @@
         null
       ],
       [
+        "GOTHA-2",
+        34492,
+        null,
+        null
+      ],
+      [
         "GOTHA-2BB",
         25501,
         null,
@@ -9909,6 +10157,12 @@
         null
       ],
       [
+        "GOTHA-2_5",
+        36572,
+        null,
+        null
+      ],
+      [
         "GOTHA-2_5L",
         32077,
         null,
@@ -9917,6 +10171,12 @@
       [
         "GOTHA-2_5R",
         32077,
+        null,
+        null
+      ],
+      [
+        "GOTHA-3",
+        35654,
         null,
         null
       ],
@@ -10335,6 +10595,12 @@
         null
       ],
       [
+        "HARRY-2",
+        29134,
+        null,
+        null
+      ],
+      [
         "HARRY-2BB",
         23932,
         null,
@@ -10371,6 +10637,12 @@
         null
       ],
       [
+        "HARRY-2_5FM",
+        58196,
+        null,
+        null
+      ],
+      [
         "HARRY-2_5FMAL",
         55595,
         null,
@@ -10397,6 +10669,12 @@
       [
         "HARRY-2_5R",
         31484,
+        null,
+        null
+      ],
+      [
+        "HARRY-3",
+        33817,
         null,
         null
       ],
@@ -10431,6 +10709,12 @@
         null
       ],
       [
+        "HARRY-HOCKER",
+        12487,
+        null,
+        null
+      ],
+      [
         "HARRY-HOCKER_RUND",
         12487,
         null,
@@ -10449,7 +10733,225 @@
         null
       ]
     ],
+    "HOVSLUND": [
+      [
+        "HOVSLUND-1",
+        23787,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1BB",
+        16533,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1L",
+        20160,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1MAL",
+        46978,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1MAR",
+        46978,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1OTTL",
+        35393,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1OTTR",
+        35393,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1R",
+        20160,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1_5BB",
+        24877,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1_5L",
+        28504,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-1_5R",
+        28504,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2BB",
+        30363,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2L",
+        33990,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2MAL",
+        62788,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2MAR",
+        62788,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2OTTL",
+        45065,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2OTTR",
+        45065,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-2R",
+        33990,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3",
+        49192,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3BB",
+        37413,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3L",
+        41040,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3MAL",
+        72451,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3MAR",
+        72451,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3ML",
+        76078,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3MR",
+        76078,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-3R",
+        41040,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-E",
+        31796,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-HOCKER",
+        9358,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-HOCKER_RUND",
+        9358,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-KS",
+        1659,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-KSP",
+        1659,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-OTRUNDL",
+        23631,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-OTRUNDR",
+        23631,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-OTTL",
+        30758,
+        null,
+        null
+      ],
+      [
+        "HOVSLUND-OTTR",
+        30758,
+        null,
+        null
+      ]
+    ],
     "HUBEI": [
+      [
+        "HUBEI-1OTRUNDL70",
+        32947,
+        null,
+        null
+      ],
       [
         "HUBEI-1OTRUNDL80",
         33997,
@@ -10463,6 +10965,12 @@
         null
       ],
       [
+        "HUBEI-1OTRUNDR70",
+        32947,
+        null,
+        null
+      ],
+      [
         "HUBEI-1OTRUNDR80",
         33997,
         null,
@@ -10471,6 +10979,42 @@
       [
         "HUBEI-1OTRUNDR90",
         34997,
+        null,
+        null
+      ],
+      [
+        "HUBEI-1_5BB",
+        21321,
+        null,
+        null
+      ],
+      [
+        "HUBEI-1_5L",
+        25816,
+        null,
+        null
+      ],
+      [
+        "HUBEI-1_5R",
+        25816,
+        null,
+        null
+      ],
+      [
+        "HUBEI-2",
+        34489,
+        null,
+        null
+      ],
+      [
+        "HUBEI-2L",
+        29994,
+        null,
+        null
+      ],
+      [
+        "HUBEI-2R",
+        29994,
         null,
         null
       ],
@@ -10517,6 +11061,18 @@
         null
       ],
       [
+        "HUBEI-HOCKER80",
+        8327,
+        null,
+        null
+      ],
+      [
+        "HUBEI-HOCKER90",
+        9377,
+        null,
+        null
+      ],
+      [
         "HUBEI-OTRUNDL",
         25481,
         null,
@@ -10525,6 +11081,224 @@
       [
         "HUBEI-OTRUNDR",
         25481,
+        null,
+        null
+      ]
+    ],
+    "HYRUP": [
+      [
+        "HYRUP-1",
+        23787,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1BB",
+        16533,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1L",
+        20160,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1MAL",
+        46978,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1MAR",
+        46978,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1OTTL",
+        35393,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1OTTR",
+        35393,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1R",
+        20160,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1_5BB",
+        24877,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1_5L",
+        28504,
+        null,
+        null
+      ],
+      [
+        "HYRUP-1_5R",
+        28504,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2BB",
+        30363,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2L",
+        33990,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2MAL",
+        62788,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2MAR",
+        62788,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2OTTL",
+        45065,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2OTTR",
+        45065,
+        null,
+        null
+      ],
+      [
+        "HYRUP-2R",
+        33990,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3",
+        49192,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3BB",
+        47413,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3L",
+        41040,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3MAL",
+        72451,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3MAR",
+        72451,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3ML",
+        76078,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3MR",
+        76078,
+        null,
+        null
+      ],
+      [
+        "HYRUP-3R",
+        41040,
+        null,
+        null
+      ],
+      [
+        "HYRUP-E",
+        31796,
+        null,
+        null
+      ],
+      [
+        "HYRUP-HOCKER",
+        9358,
+        null,
+        null
+      ],
+      [
+        "HYRUP-HOCKER_RUND",
+        9358,
+        null,
+        null
+      ],
+      [
+        "HYRUP-KS",
+        1659,
+        null,
+        null
+      ],
+      [
+        "HYRUP-KS70",
+        3768,
+        null,
+        null
+      ],
+      [
+        "HYRUP-KSP",
+        1659,
+        null,
+        null
+      ],
+      [
+        "HYRUP-OTRUNDL",
+        23631,
+        null,
+        null
+      ],
+      [
+        "HYRUP-OTRUNDR",
+        23631,
+        null,
+        null
+      ],
+      [
+        "HYRUP-OTTL",
+        30758,
+        null,
+        null
+      ],
+      [
+        "HYRUP-OTTR",
+        30758,
         null,
         null
       ]
@@ -10731,6 +11505,12 @@
     ],
     "ISOLA": [
       [
+        "ISOLA-1BB",
+        20855,
+        null,
+        null
+      ],
+      [
         "ISOLA-1OTTL",
         39730,
         null,
@@ -10743,8 +11523,26 @@
         null
       ],
       [
+        "ISOLA-2BB",
+        40719,
+        null,
+        null
+      ],
+      [
         "ISOLA-2L",
         45914,
+        null,
+        null
+      ],
+      [
+        "ISOLA-2MAL",
+        68675,
+        null,
+        null
+      ],
+      [
+        "ISOLA-2MAR",
+        68675,
         null,
         null
       ],
@@ -11345,12 +12143,6 @@
         null
       ],
       [
-        "KAIRO-1OTRUNDL120",
-        39197,
-        null,
-        null
-      ],
-      [
         "KAIRO-1OTRUNDL80",
         35097,
         null,
@@ -11359,12 +12151,6 @@
       [
         "KAIRO-1OTRUNDR100",
         37097,
-        null,
-        null
-      ],
-      [
-        "KAIRO-1OTRUNDR120",
-        39197,
         null,
         null
       ],
@@ -11381,12 +12167,6 @@
         null
       ],
       [
-        "KAIRO-1OTTL120",
-        39097,
-        null,
-        null
-      ],
-      [
         "KAIRO-1OTTL80",
         35097,
         null,
@@ -11395,12 +12175,6 @@
       [
         "KAIRO-1OTTR100",
         37097,
-        null,
-        null
-      ],
-      [
-        "KAIRO-1OTTR120",
-        39097,
         null,
         null
       ],
@@ -11509,6 +12283,12 @@
     ],
     "KAZAR": [
       [
+        "KAZAR-1BB",
+        13316,
+        null,
+        2503
+      ],
+      [
         "KAZAR-1OTTAL100",
         30686,
         null,
@@ -11563,8 +12343,26 @@
         2503
       ],
       [
+        "KAZAR-1_5L",
+        21247,
+        null,
+        4279
+      ],
+      [
+        "KAZAR-1_5R",
+        21247,
+        null,
+        4279
+      ],
+      [
         "KAZAR-2",
         27229,
+        null,
+        5006
+      ],
+      [
+        "KAZAR-2BB",
+        20869,
         null,
         5006
       ],
@@ -12147,6 +12945,18 @@
     ],
     "KOLO": [
       [
+        "KOLO-1BB",
+        25289,
+        null,
+        null
+      ],
+      [
+        "KOLO-1OTTL70",
+        44157,
+        null,
+        null
+      ],
+      [
         "KOLO-1OTTL80",
         45207,
         null,
@@ -12155,6 +12965,12 @@
       [
         "KOLO-1OTTL90",
         46257,
+        null,
+        null
+      ],
+      [
+        "KOLO-1OTTR70",
+        44157,
         null,
         null
       ],
@@ -12171,6 +12987,12 @@
         null
       ],
       [
+        "KOLO-2L",
+        39996,
+        null,
+        null
+      ],
+      [
         "KOLO-2OTRUNDL",
         48481,
         null,
@@ -12183,14 +13005,50 @@
         null
       ],
       [
+        "KOLO-2R",
+        39996,
+        null,
+        null
+      ],
+      [
         "KOLO-2_5BB",
         37581,
         null,
         null
       ],
       [
+        "KOLO-2_5L",
+        42076,
+        null,
+        null
+      ],
+      [
+        "KOLO-2_5R",
+        42076,
+        null,
+        null
+      ],
+      [
+        "KOLO-3",
+        48654,
+        null,
+        null
+      ],
+      [
         "KOLO-3L",
         44159,
+        null,
+        null
+      ],
+      [
+        "KOLO-3OTRUNDL",
+        53481,
+        null,
+        null
+      ],
+      [
+        "KOLO-3OTRUNDR",
+        53481,
         null,
         null
       ],
@@ -12203,6 +13061,30 @@
       [
         "KOLO-E",
         28503,
+        null,
+        null
+      ],
+      [
+        "KOLO-E_RUND45",
+        21632,
+        null,
+        null
+      ],
+      [
+        "KOLO-E_RUND90",
+        31632,
+        null,
+        null
+      ],
+      [
+        "KOLO-OTRUNDL",
+        35481,
+        null,
+        null
+      ],
+      [
+        "KOLO-OTRUNDR",
+        35481,
         null,
         null
       ],
@@ -13779,6 +14661,50 @@
         null
       ]
     ],
+    "LIV_IN_LUCENA": [
+      [
+        "LIV_IN_LUCENA-1OTTL80",
+        56876,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-1OTTR80",
+        56876,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-2L",
+        60318,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-2R",
+        60318,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-3FMAL",
+        97745,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-3FMAR",
+        97745,
+        null,
+        null
+      ],
+      [
+        "LIV_IN_LUCENA-E",
+        47057,
+        null,
+        null
+      ]
+    ],
     "LOU": [
       [
         "LOU-1BB",
@@ -14530,6 +15456,62 @@
         "MABALO-OTTR",
         30422,
         6015,
+        null
+      ]
+    ],
+    "MACON": [
+      [
+        "MACON-1OTRUNDL90",
+        32257,
+        null,
+        null
+      ],
+      [
+        "MACON-1OTRUNDR90",
+        32257,
+        null,
+        null
+      ],
+      [
+        "MACON-2_5FMAL",
+        55595,
+        null,
+        null
+      ],
+      [
+        "MACON-2_5FMAR",
+        55595,
+        null,
+        null
+      ],
+      [
+        "MACON-2_5L",
+        31484,
+        null,
+        null
+      ],
+      [
+        "MACON-2_5R",
+        31484,
+        null,
+        null
+      ],
+      [
+        "MACON-E",
+        24557,
+        null,
+        null
+      ],
+      [
+        "MACON-OTRUNDL",
+        21857,
+        null,
+        null
+      ],
+      [
+        "MACON-OTRUNDR",
+        21857,
+        null,
         null
       ]
     ],
@@ -17131,6 +18113,12 @@
     ],
     "MURCIA_KV": [
       [
+        "MURCIA_KV-1",
+        39804,
+        null,
+        null
+      ],
+      [
         "MURCIA_KV-1OTBKL",
         44649,
         null,
@@ -17143,8 +18131,26 @@
         null
       ],
       [
+        "MURCIA_KV-1OTTL",
+        38149,
+        null,
+        null
+      ],
+      [
         "MURCIA_KV-2BB",
         38603,
+        null,
+        null
+      ],
+      [
+        "MURCIA_KV-2FL",
+        49182,
+        null,
+        null
+      ],
+      [
+        "MURCIA_KV-2FR",
+        49182,
         null,
         null
       ],
@@ -18615,6 +19621,122 @@
         null
       ]
     ],
+    "OMAHA": [
+      [
+        "OMAHA-1OTRUNDL70",
+        32947,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1OTRUNDL80",
+        33997,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1OTRUNDL90",
+        34997,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1OTRUNDR70",
+        32947,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1OTRUNDR80",
+        33997,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1OTRUNDR90",
+        34997,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1_5L",
+        25816,
+        null,
+        null
+      ],
+      [
+        "OMAHA-1_5R",
+        25816,
+        null,
+        null
+      ],
+      [
+        "OMAHA-2L",
+        29994,
+        null,
+        null
+      ],
+      [
+        "OMAHA-2R",
+        29994,
+        null,
+        null
+      ],
+      [
+        "OMAHA-2_5BB",
+        27581,
+        null,
+        null
+      ],
+      [
+        "OMAHA-2_5L",
+        32077,
+        null,
+        null
+      ],
+      [
+        "OMAHA-2_5R",
+        32077,
+        null,
+        null
+      ],
+      [
+        "OMAHA-3L",
+        34159,
+        null,
+        null
+      ],
+      [
+        "OMAHA-3R",
+        34159,
+        null,
+        null
+      ],
+      [
+        "OMAHA-E",
+        23503,
+        null,
+        null
+      ],
+      [
+        "OMAHA-HOCKER80",
+        8327,
+        null,
+        null
+      ],
+      [
+        "OMAHA-OTRUNDL",
+        25481,
+        null,
+        null
+      ],
+      [
+        "OMAHA-OTRUNDR",
+        25481,
+        null,
+        null
+      ]
+    ],
     "ONTARIO": [
       [
         "ONTARIO-1",
@@ -18817,6 +19939,18 @@
     ],
     "ORELI": [
       [
+        "ORELI-1BB",
+        25289,
+        null,
+        null
+      ],
+      [
+        "ORELI-1OTTL70",
+        44157,
+        null,
+        null
+      ],
+      [
         "ORELI-1OTTL80",
         45207,
         null,
@@ -18825,6 +19959,12 @@
       [
         "ORELI-1OTTL90",
         46257,
+        null,
+        null
+      ],
+      [
+        "ORELI-1OTTR70",
+        44157,
         null,
         null
       ],
@@ -18841,6 +19981,12 @@
         null
       ],
       [
+        "ORELI-2L",
+        39996,
+        null,
+        null
+      ],
+      [
         "ORELI-2OTRUNDL",
         48481,
         null,
@@ -18849,6 +19995,12 @@
       [
         "ORELI-2OTRUNDR",
         48481,
+        null,
+        null
+      ],
+      [
+        "ORELI-2R",
+        39996,
         null,
         null
       ],
@@ -18865,6 +20017,18 @@
         null
       ],
       [
+        "ORELI-3OTRUNDL",
+        53481,
+        null,
+        null
+      ],
+      [
+        "ORELI-3OTRUNDR",
+        53481,
+        null,
+        null
+      ],
+      [
         "ORELI-3R",
         44159,
         null,
@@ -18873,6 +20037,30 @@
       [
         "ORELI-E",
         28503,
+        null,
+        null
+      ],
+      [
+        "ORELI-E_RUND45",
+        21632,
+        null,
+        null
+      ],
+      [
+        "ORELI-E_RUND90",
+        31632,
+        null,
+        null
+      ],
+      [
+        "ORELI-OTRUNDL",
+        35481,
+        null,
+        null
+      ],
+      [
+        "ORELI-OTRUNDR",
+        35481,
         null,
         null
       ],
@@ -21263,7 +22451,7 @@
     ],
     "TIBERI": [
       [
-        "TIBERI",
+        "TIBERI-DS",
         30261,
         null,
         null
@@ -21619,6 +22807,12 @@
       [
         "TOKIO-3",
         39403,
+        null,
+        null
+      ],
+      [
+        "TOKIO-3BB",
+        28915,
         null,
         null
       ],
@@ -21999,8 +23193,20 @@
         null
       ],
       [
+        "TRANI-3ML",
+        72492,
+        null,
+        null
+      ],
+      [
         "TRANI-3MM",
         100933,
+        null,
+        null
+      ],
+      [
+        "TRANI-3MR",
+        72492,
         null,
         null
       ],
@@ -24899,6 +26105,12 @@
         null
       ],
       [
+        "VITO_MAYLA-1M",
+        50007,
+        null,
+        null
+      ],
+      [
         "VITO_MAYLA-1MAL",
         45851,
         null,
@@ -25177,8 +26389,32 @@
         null
       ],
       [
+        "VITO_WISOM-2FL",
+        49182,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM-2FR",
+        49182,
+        null,
+        null
+      ],
+      [
         "VITO_WISOM-2L",
         33976,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM-2MAL",
+        67916,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM-2MAR",
+        67916,
         null,
         null
       ],
@@ -25209,6 +26445,18 @@
       [
         "VITO_WISOM-3L",
         38357,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM-3MAL",
+        77288,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM-3MAR",
+        77280,
         null,
         null
       ],
@@ -25245,8 +26493,26 @@
     ],
     "VITO_WISOM_KV": [
       [
+        "VITO_WISOM_KV-1BB",
+        27998,
+        null,
+        null
+      ],
+      [
         "VITO_WISOM_KV-1L",
         33901,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-1MAL",
+        51978,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-1MAR",
+        51978,
         null,
         null
       ],
@@ -25277,6 +26543,24 @@
       [
         "VITO_WISOM_KV-1R",
         33901,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-2",
+        49893,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-2BB",
+        38087,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-2FBB",
+        43297,
         null,
         null
       ],
@@ -25373,6 +26657,18 @@
       [
         "VITO_WISOM_KV-E",
         37132,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-OTBKL",
+        32793,
+        null,
+        null
+      ],
+      [
+        "VITO_WISOM_KV-OTBKR",
+        32793,
         null,
         null
       ],
