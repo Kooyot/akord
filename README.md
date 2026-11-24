@@ -1,1 +1,1 @@
-Aktualizacja 20.09.2026
+Aktualizacja 24.11.2026
