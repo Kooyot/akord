@@ -164,13 +164,32 @@ function klucz(s){
 function normalizuj(tekst){
   return String(tekst).toUpperCase()
     .replace(/[‐‑‒–—―−~=]/g, "-")          // rozne kreski z OCR i ze schowka
-    .replace(/\s*-\s*/g, "-")
-    .replace(/[^A-Z0-9_\-\/\s]/g, " ");
+    .replace(/\s*([-+])\s*/g, "$1")
+    .replace(/[^A-Z0-9_\-+\/\s]/g, " ");
 }
 function hamming1(a, b){
   if (a.length !== b.length) return false;
   let r = 0; for (let i = 0; i < a.length; i++) if (a[i] !== b[i] && ++r > 1) return false;
   return r === 1;
+}
+/* Rozklada sklejony kawalek na bryly z cennika. Bierze podzial na NAJMNIEJ
+   czesci (1OTTRKSKS = 1OTTR+KS+KS, a nie 1+OTTR+KS+KS) i tylko wtedy,
+   gdy taki podzial jest jeden. Uzywa tylko bryl jednoznacznych po ksztalcie. */
+function rozloz(k, wgKlucza){
+  const n = k.length, naj = new Array(n + 1).fill(null);
+  naj[n] = {ile: 0, sposoby: 1, dalej: null};
+  for (let i = n - 1; i >= 0; i--){
+    for (let j = i + 1; j <= n; j++){
+      const kto = wgKlucza.get(k.slice(i, j)), r = naj[j];
+      if (!kto || kto.length !== 1 || !r) continue;
+      const ile = r.ile + 1;
+      if (!naj[i] || ile < naj[i].ile) naj[i] = {ile, sposoby: r.sposoby, dalej: j, bryla: kto[0]};
+      else if (ile === naj[i].ile) naj[i].sposoby = Math.min(2, naj[i].sposoby + r.sposoby);
+    }
+  }
+  if (!naj[0] || naj[0].ile < 2 || naj[0].sposoby !== 1) return null;
+  const wynik = []; for (let i = 0; i < n; i = naj[i].dalej) wynik.push(naj[i].bryla);
+  return wynik;
 }
 function dopasuj(tekst){
   if (!CENNIK) return null;
@@ -211,7 +230,8 @@ function dopasuj(tekst){
   for (const x of koncowki){ const k = klucz(x.sufiks); wgKlucza.set(k, (wgKlucza.get(k) || []).concat(x)); }
 
   const pozycje = [];
-  for (let seg of reszta.split("-")){
+  // „+" na kartce laczy dodatkowe bryly (np. 1OTTR+KS+KS) — tak samo jak kreska
+  for (let seg of reszta.split(/[-+]/)){
     seg = seg.replace(/[^A-Z0-9_\/]/g, "");
     if (!seg || !/[A-Z0-9]/.test(seg)) continue;
     const k = klucz(seg);
@@ -223,12 +243,8 @@ function dopasuj(tekst){
     // jedna pomylona litera spoza listy ksztaltow — tylko gdy kandydat jest jeden
     const blisko = koncowki.filter((x) => hamming1(klucz(x.sufiks), k));
     if (blisko.length === 1){ pozycje.push({odczyt:seg, ...blisko[0], status:"popr", sprawdz:true}); continue; }
-    // zgubiona kreska: dwie bryly sklejone w jeden kawalek
-    let rozdzial = null;
-    for (let c = 1; c < k.length && !rozdzial; c++){
-      const a = wgKlucza.get(k.slice(0, c)), b = wgKlucza.get(k.slice(c));
-      if (a && b && a.length === 1 && b.length === 1) rozdzial = [a[0], b[0]];
-    }
+    // zgubiona kreska albo plus: kilka bryl sklejonych w jeden kawalek
+    const rozdzial = rozloz(k, wgKlucza);
     if (rozdzial){ for (const x of rozdzial) pozycje.push({odczyt:seg, ...x, status:"popr", sprawdz:true, sklejone:true}); continue; }
     pozycje.push({odczyt:seg, status:"brak"});
   }
@@ -260,7 +276,7 @@ async function czytnik(){
     }
   });
   await worker.setParameters({
-    tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_/",
+    tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_/+",
     user_defined_dpi: "300"
   });
   $("postep").hidden = true;
