@@ -245,7 +245,9 @@ function dopasuj(tekst){
     if (blisko.length === 1){ pozycje.push({odczyt:seg, ...blisko[0], status:"popr", sprawdz:true}); continue; }
     // zgubiona kreska albo plus: kilka bryl sklejonych w jeden kawalek
     const rozdzial = rozloz(k, wgKlucza);
-    if (rozdzial){ for (const x of rozdzial) pozycje.push({odczyt:seg, ...x, status:"popr", sprawdz:true, sklejone:true}); continue; }
+    // jednoznakowa bryla (1, 2, E, L…) w sklejce to najczesciej smiec z OCR
+    // (np. zle przeczytany „+KS") — pokazujemy ja, ale nie zaznaczamy
+    if (rozdzial){ for (const x of rozdzial) pozycje.push({odczyt:seg, ...x, status:"popr", sprawdz:true, sklejone:true, niepewna: klucz(x.sufiks).length < 2}); continue; }
     pozycje.push({odczyt:seg, status:"brak"});
   }
   // Ostatni kawalek moze byc ucietym kodem (np. „3" zamiast „3FMBB"), a i tak
@@ -257,7 +259,8 @@ function dopasuj(tekst){
   }
   return {mebel: traf.mebel, pozycje, tekst: zwarty};
 }
-const punkty = (d) => !d || !d.mebel ? 0 : 1 + d.pozycje.reduce((s, p) => s + (p.status === "ok" ? 3 : p.status === "popr" ? 2 : 0), 0);
+// ocena odczytu: pewna bryla 3, poprawiona 2, wyciagnieta ze sklejki 1, niepewna 0
+const punkty = (d) => !d || !d.mebel ? 0 : 1 + d.pozycje.reduce((s, p) => s + (p.niepewna ? 0 : p.status === "ok" ? 3 : p.sklejone ? 1 : p.status === "popr" ? 2 : 0), 0);
 
 /* ================= OCR ================= */
 let worker = null;
@@ -397,13 +400,23 @@ async function szukaj(zrodlo, x, y, w, h){
     const y0 = Math.max(0, bb.y0 - 0.6 * wys), y1 = Math.min(H, bb.y1 + 0.6 * wys);
     const zapas = 0.04 * W;
     const okna = [
-      [Math.max(0, bb.x0 - zapas), Math.min(W, bb.x1 + zapas)],
-      [Math.max(0, bb.x0 - zapas), W],
-      [0, W],
+      [Math.max(0, bb.x0 - zapas), Math.min(W, bb.x1 + zapas), y0, y1],
+      [Math.max(0, bb.x0 - zapas), W, y0, y1],
+      [0, W, y0, y1],
     ];
+    // „linia" z OCR czasem obejmuje tez wiersz nad kodem — wtedy czytamy
+    // jeszcze pas o wysokosci samego slowa z nazwa mebla
+    const slowo = (l.words || []).find((w) => { const x = dopasuj(w.text); return x && x.mebel; });
+    if (slowo){
+      const sw = slowo.bbox, h = sw.y1 - sw.y0;
+      if (h < wys * 0.8){
+        const ty0 = Math.max(0, sw.y0 - 0.35 * h), ty1 = Math.min(H, sw.y1 + 0.35 * h);
+        okna.push([Math.max(0, sw.x0 - zapas), W, ty0, ty1], [0, W, ty0, ty1]);
+      }
+    }
     lepszy({tekst: l.text.trim(), podglad: null, d});
-    for (const [x0, x1] of okna){
-      const r = await czytajLinie(c, x0, y0, x1 - x0, y1 - y0);
+    for (const [x0, x1, oy0, oy1] of okna){
+      const r = await czytajLinie(c, x0, oy0, x1 - x0, oy1 - oy0);
       lepszy({...r, d: dopasuj(r.tekst)});
     }
   }
@@ -502,7 +515,7 @@ function pokaz(r){
   for (const p of d.pozycje){
     const jest = p.kod && lista.find((x) => x.kod === p.kod && x.status !== "brak");
     if (jest){ jest.q++; continue; }
-    lista.push({...p, q: 1, wybrana: p.status !== "brak" && !p.mozeUciete});
+    lista.push({...p, q: 1, wybrana: p.status !== "brak" && !p.mozeUciete && !p.niepewna});
   }
   biezacy.lista = lista;
   const bryly = CENNIK[d.mebel];
@@ -518,6 +531,7 @@ function pokaz(r){
         + `<option disabled>──────────</option>` + reszta.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join("") + `</select>`;
     }
     else if (p.status === "ok") opis = `<span class="chip ok">✓ zgodna z cennikiem</span>`;
+    else if (p.niepewna) opis = `<span class="chip popr">niepewne · odczytano „${esc(p.odczyt)}” — zaznacz tylko, jeśli jest na kartce</span>`;
     else if (p.status === "popr") opis = `<span class="chip popr">${p.sklejone ? "rozdzielone" : "poprawione"} · odczytano „${esc(p.odczyt)}”${p.sprawdz ? " — sprawdź" : ""}</span>`;
     else {
       opis = `<span class="chip brak">nie rozpoznano „${esc(p.odczyt)}”${p.powod ? " (" + esc(p.powod) + ")" : ""} — wybierz</span>`;
