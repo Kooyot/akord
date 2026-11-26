@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Skaner kartek — test</title>
+<style>
+  /* Wyglad jak w Akordzie: te same kolory i kroje, zeby test wygladal jak przyszla funkcja. */
+  :root{
+    --grunt:#f2f3ef; --plyta:#ffffff; --plyta2:#e9ebe5;
+    --tusz:#1a1d21; --cichy:#697280; --kreska:#d3d7cf;
+    --akcent:#2d4a7c; --akcent-tlo:#e4eaf4;
+    --kwota:#8a6420; --dobry:#3f7d58; --rdza:#a35b2a; --zolty:#9a7410; --zolty-tlo:#f6efd9;
+    --czerw:#a8322c; --czerw-tlo:#f6e2e0; --dobry-tlo:#e3efe7; --na-akcencie:#ffffff;
+    --r:8px;
+    --ui:ui-sans-serif,-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --grunt:#14171b; --plyta:#1d2126; --plyta2:#262b31;
+      --tusz:#e8eae6; --cichy:#8b949f; --kreska:#333a42;
+      --akcent:#8fb0e4; --akcent-tlo:#22303f;
+      --kwota:#d9a950; --dobry:#6fb98a; --rdza:#d08a55; --zolty:#e0b85a; --zolty-tlo:#332b17;
+      --czerw:#e3847c; --czerw-tlo:#3a2220; --dobry-tlo:#1c3026; --na-akcencie:#14171b;
+      color-scheme:dark;
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--grunt);color:var(--tusz);font-family:var(--ui);font-size:15px;line-height:1.45;
+       padding:env(safe-area-inset-top,0) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .owijka{max-width:560px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:10px;padding:18px 0 6px}
+  h1{margin:0;font-size:22px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
+  h1 span{color:var(--akcent)}
+  .test{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+        color:var(--zolty);background:var(--zolty-tlo);padding:2px 7px;border-radius:5px}
+  .wstep{color:var(--cichy);font-size:13.5px;margin:4px 0 14px}
+
+  .kamera{position:relative;background:#0b0d10;border-radius:var(--r);overflow:hidden;aspect-ratio:3/4;max-height:62vh;width:100%}
+  .kamera video,.kamera img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .kamera .zaslona{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+                   gap:12px;color:#e8eae6;text-align:center;padding:20px;font-size:14px}
+  /* ramka na linie z kodem: szeroka i niska, jak linia „Model" na karcie */
+  .ramka{position:absolute;left:6%;right:6%;top:44%;height:12%;border:2px solid #fff;border-radius:6px;
+         box-shadow:0 0 0 2000px rgba(0,0,0,.45)}
+  .ramka::after{content:"linia z kodem modelu";position:absolute;left:0;right:0;top:calc(100% + 8px);
+                text-align:center;color:#fff;font-size:12.5px;font-weight:600;text-shadow:0 1px 2px #000}
+
+  .rzad{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--kreska);background:var(--plyta);color:var(--tusz);font:inherit;font-weight:650;
+       padding:12px 15px;border-radius:var(--r);cursor:pointer;min-height:46px;flex:1 1 auto;text-align:center}
+  .btn:focus-visible{outline:2px solid var(--akcent);outline-offset:2px}
+  .btn-glowny{background:var(--akcent);border-color:var(--akcent);color:var(--na-akcencie)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn input{display:none}
+  label.btn{display:inline-flex;align-items:center;justify-content:center}
+
+  .pole{width:100%;font:15px var(--mono);padding:12px;border-radius:var(--r);border:1px solid var(--kreska);
+        background:var(--plyta);color:var(--tusz);text-transform:uppercase}
+  .pole:focus{outline:2px solid var(--akcent);outline-offset:1px}
+  .lub{display:flex;align-items:center;gap:10px;color:var(--cichy);font-size:12px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:.1em}
+  .lub::before,.lub::after{content:"";flex:1;height:1px;background:var(--kreska)}
+
+  .stan{font-size:13px;color:var(--cichy);margin-top:10px;min-height:18px}
+  .pasek-postepu{height:4px;background:var(--plyta2);border-radius:2px;overflow:hidden;margin-top:6px}
+  .pasek-postepu i{display:block;height:100%;width:0;background:var(--akcent);transition:width .2s}
+
+  .wynik{background:var(--plyta);border:1px solid var(--kreska);border-radius:var(--r);padding:14px;margin-top:16px}
+  .wynik h2{margin:0 0 2px;font-size:19px;letter-spacing:.06em}
+  .odczyt{font:12px var(--mono);color:var(--cichy);word-break:break-all;margin-bottom:10px}
+  .bryla{display:grid;grid-template-columns:auto 1fr auto;gap:4px 11px;align-items:center;padding:10px 0;border-top:1px solid var(--kreska)}
+  .bryla input[type=checkbox]{width:22px;height:22px;accent-color:var(--akcent);margin:0}
+  .bryla .kod{font:600 15px var(--mono);min-width:0;word-break:break-all}
+  .bryla .cena{font:14px var(--mono);font-variant-numeric:tabular-nums;color:var(--kwota);white-space:nowrap}
+  .bryla .opis{grid-column:2 / 4;font-size:12.5px}
+  .bryla select{grid-column:2 / 4;font:14px var(--mono);padding:8px;border-radius:6px;border:1px solid var(--kreska);
+                background:var(--plyta);color:var(--tusz);width:100%}
+  .chip{display:inline-block;padding:1px 7px;border-radius:5px;font-weight:600}
+  .ok{color:var(--dobry);background:var(--dobry-tlo)}
+  .popr{color:var(--zolty);background:var(--zolty-tlo)}
+  .brak{color:var(--czerw);background:var(--czerw-tlo)}
+  .suma{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--tusz);padding-top:10px;margin-top:2px}
+  .suma b{font:700 20px var(--mono);color:var(--kwota);font-variant-numeric:tabular-nums}
+  .info{font-size:13px;color:var(--cichy);margin-top:8px}
+  details{margin-top:10px;font-size:13px;color:var(--cichy)}
+  details img{display:block;margin-top:6px;border:1px solid var(--kreska);border-radius:4px;background:#fff}
+  .caly-kod{color:var(--tusz);font-size:14px}
+  .uwaga-uciete{font-size:13px;color:var(--czerw);background:var(--czerw-tlo);border-radius:6px;padding:7px 10px}
+  .gotowe{background:var(--dobry-tlo);border:1px solid var(--dobry);border-left:4px solid var(--dobry);border-radius:var(--r);
+          padding:13px 14px;margin-top:14px;font-size:14px}
+  .gotowe b{color:var(--dobry)}
+  @media (prefers-reduced-motion:reduce){.pasek-postepu i{transition:none}}
+</style>
+</head>
+<body>
+<div class="owijka">
+  <header><h1>Akord<span>.</span></h1><span class="test">skaner · test</span></header>
+  <p class="wstep">Wersja do wypróbowania. Odczytuje kod modelu z kartki i zaznacza bryły z cennika. Nic nie zapisuje do dziennika.</p>
+
+  <div class="kamera" id="kamera">
+    <video id="wideo" playsinline muted hidden></video>
+    <img id="zdjecie" alt="" hidden>
+    <div class="ramka" id="ramka" hidden></div>
+    <div class="zaslona" id="zaslona">
+      <div>Ustaw linię z kodem modelu w ramce<br>i naciśnij „Skanuj”.</div>
+      <button class="btn btn-glowny" id="btn-aparat" style="flex:0 0 auto">Włącz aparat</button>
+    </div>
+  </div>
+  <div class="rzad">
+    <button class="btn btn-glowny" id="btn-skanuj" disabled>Skanuj</button>
+    <label class="btn" for="plik">Zdjęcie kartki<input type="file" id="plik" accept="image/*"></label>
+  </div>
+  <div class="stan" id="stan"></div>
+  <div class="pasek-postepu" id="postep" hidden><i></i></div>
+
+  <div class="lub">albo</div>
+  <form id="form-kod" class="rzad" style="margin-top:0">
+    <input class="pole" id="kod" placeholder="Wpisz lub wklej kod, np. KORFU-OTTGL-ECEL" autocomplete="off" autocapitalize="characters" spellcheck="false" style="flex:1 1 220px">
+    <button class="btn" type="submit" style="flex:0 0 auto">Sprawdź</button>
+  </form>
+
+  <div id="wynik"></div>
+</div>
+
+<script src="vendor/tesseract.min.js"></script>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const doGroszy = (t) => Math.round(t / 10) * 10;                       // jak w Akordzie
+const zl = (t) => (doGroszy(t) / 1000).toLocaleString("pl-PL", {minimumFractionDigits:2, maximumFractionDigits:2}) + " zł";
+const odm = (n,a,b,c) => n===1 ? a : (n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? b : c);
+const stan = (t) => { $("stan").textContent = t; };
+
+/* ================= CENNIK ================= */
+let CENNIK = null;          // { MEBEL: [[kod, T, P, W], ...] }
+let KLUCZE_MEBLI = [];      // [{klucz, mebel}] od najdluzszego
+const gotowyCennik = fetch("../cennik.json?v=" + Date.now(), {cache:"no-store"})
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((p) => {
+    CENNIK = p.dane;
+    KLUCZE_MEBLI = Object.keys(CENNIK).map((m) => ({klucz: klucz(m), mebel: m}))
+      .sort((a, b) => b.klucz.length - a.klucz.length);
+    stan(`Cennik z ${p.baza}: ${Object.keys(CENNIK).length} mebli.`);
+  })
+  .catch(() => stan("Nie udało się pobrać cennika. Sprawdź internet i odśwież stronę."));
+
+/* ================= DOPASOWANIE KODU =================
+   Kod na kartce to MEBEL-BRYLA-BRYLA-..., np. KORFU-OTTGL-ECEL-3FMBB-1OTTR70.
+   OCR myli znaki o podobnym ksztalcie (O i 0, I i 1, B i 8, „7" i „/").
+   Porownujemy wiec „ksztalty": oba napisy sprowadzamy do jednej postaci.
+   Zasada bezpieczenstwa: poprawiamy tylko wtedy, gdy pasuje DOKLADNIE jedna
+   bryla. Czego nie da sie rozstrzygnac, nie zgadujemy — pracownik wybiera. */
+/* Pary sprawdzone na calym cenniku: zadne dwie prawdziwe bryly jednego mebla
+   ani zadne dwie nazwy mebli nie zlewaja sie przez nie w jedno. */
+const KSZTALT = {"0":"O","D":"O","1":"I","L":"I","|":"I","8":"B","5":"S","2":"Z","6":"G","/":"7","T":"7"};
+function klucz(s){
+  return String(s).toUpperCase().replace(/[\s_]/g, "").replace(/[0D1L|8526\/T]/g, (c) => KSZTALT[c] || c);
+}
+function normalizuj(tekst){
+  return String(tekst).toUpperCase()
+    .replace(/[‐‑‒–—―−~=]/g, "-")          // rozne kreski z OCR i ze schowka
+    .replace(/\s*-\s*/g, "-")
+    .replace(/[^A-Z0-9_\-\/\s]/g, " ");
+}
+function hamming1(a, b){
+  if (a.length !== b.length) return false;
+  let r = 0; for (let i = 0; i < a.length; i++) if (a[i] !== b[i] && ++r > 1) return false;
+  return r === 1;
+}
+function dopasuj(tekst){
+  if (!CENNIK) return null;
+  const t = normalizuj(tekst);
+  const zwarty = t.replace(/\s+/g, "");
+  const kZwarty = klucz(zwarty);
+  // mebel: nazwa z cennika, po ktorej stoi kreska — ta, ktora zaczyna sie najwczesniej
+  // (nazwa mebla otwiera kod), a przy remisie najdluzsza (KAIRO, nie KAI)
+  let traf = null;
+  for (const {klucz: k, mebel} of KLUCZE_MEBLI){
+    const i = kZwarty.indexOf(k + "-");
+    if (i >= 0 && (!traf || i < traf.i)) traf = {mebel, i, k};
+  }
+  if (!traf){
+    // meble z jednym kodem bez kresek (np. ALKEN, TV_BONN): caly kod to jedna bryla
+    for (const slowo of t.split(/[\s\-]+/)){
+      const k = klucz(slowo); if (k.length < 3) continue;
+      for (const [mebel, lista] of Object.entries(CENNIK)){
+        const b = lista.find((x) => !x[0].includes("-") && klucz(x[0]) === k);
+        if (b) return {mebel, pozycje:[{odczyt:slowo, kod:b[0], cena:b[1], sufiks:b[0], status: slowo === b[0] ? "ok" : "popr"}], tekst:zwarty};
+      }
+    }
+    return {mebel:null, pozycje:[], tekst:zwarty};
+  }
+
+  // reszta po nazwie mebla, w oryginalnych znakach (zachowujemy to, co przeczytal OCR)
+  let reszta = "", poz = 0;
+  for (let j = 0, kk = 0; j < zwarty.length; j++){       // przesun sie w `zwarty` o tyle znakow, ile zajmuje nazwa+kreska w kluczu
+    if (/[_]/.test(zwarty[j])) continue;
+    kk++;
+    if (kk === traf.i + traf.k.length + 1){ poz = j + 1; break; }
+  }
+  reszta = zwarty.slice(poz);
+
+  const bryly = CENNIK[traf.mebel];
+  const koncowki = bryly.filter((b) => b[0].includes("-")).map((b) => ({sufiks: b[0].slice(b[0].indexOf("-") + 1), kod: b[0], cena: b[1]}));
+  const wgKlucza = new Map();
+  for (const x of koncowki){ const k = klucz(x.sufiks); wgKlucza.set(k, (wgKlucza.get(k) || []).concat(x)); }
+
+  const pozycje = [];
+  for (let seg of reszta.split("-")){
+    seg = seg.replace(/[^A-Z0-9_\/]/g, "");
+    if (!seg || !/[A-Z0-9]/.test(seg)) continue;
+    const k = klucz(seg);
+    const dokladne = koncowki.filter((x) => x.sufiks === seg);
+    if (dokladne.length === 1){ pozycje.push({odczyt:seg, ...dokladne[0], status:"ok"}); continue; }
+    const pokształcie = wgKlucza.get(k) || [];
+    if (pokształcie.length === 1){ pozycje.push({odczyt:seg, ...pokształcie[0], status:"popr"}); continue; }
+    if (pokształcie.length > 1){ pozycje.push({odczyt:seg, status:"brak", powod:"kilka podobnych brył"}); continue; }
+    // jedna pomylona litera spoza listy ksztaltow — tylko gdy kandydat jest jeden
+    const blisko = koncowki.filter((x) => hamming1(klucz(x.sufiks), k));
+    if (blisko.length === 1){ pozycje.push({odczyt:seg, ...blisko[0], status:"popr", sprawdz:true}); continue; }
+    // zgubiona kreska: dwie bryly sklejone w jeden kawalek
+    let rozdzial = null;
+    for (let c = 1; c < k.length && !rozdzial; c++){
+      const a = wgKlucza.get(k.slice(0, c)), b = wgKlucza.get(k.slice(c));
+      if (a && b && a.length === 1 && b.length === 1) rozdzial = [a[0], b[0]];
+    }
+    if (rozdzial){ for (const x of rozdzial) pozycje.push({odczyt:seg, ...x, status:"popr", sprawdz:true, sklejone:true}); continue; }
+    pozycje.push({odczyt:seg, status:"brak"});
+  }
+  // Ostatni kawalek moze byc ucietym kodem (np. „3" zamiast „3FMBB"), a i tak
+  // pasowac do prawdziwej bryly. Wtedy nie zaznaczamy go sami — pracownik potwierdza.
+  const ost = pozycje[pozycje.length - 1];
+  if (ost && ost.kod && ost.status !== "brak"){
+    const dluzsze = koncowki.filter((x) => x.sufiks !== ost.sufiks && klucz(x.sufiks).startsWith(klucz(ost.sufiks)));
+    if (dluzsze.length) { ost.mozeUciete = true; ost.dluzsze = dluzsze.map((x) => x.kod); }
+  }
+  return {mebel: traf.mebel, pozycje, tekst: zwarty};
+}
+const punkty = (d) => !d || !d.mebel ? 0 : 1 + d.pozycje.reduce((s, p) => s + (p.status === "ok" ? 3 : p.status === "popr" ? 2 : 0), 0);
+
+/* ================= OCR ================= */
+let worker = null;
+async function czytnik(){
+  if (worker) return worker;
+  const baza = new URL("vendor/", location.href).href;
+  $("postep").hidden = false;
+  stan("Wczytuję czytnik tekstu… (za pierwszym razem ok. 7 MB, potem z pamięci telefonu)");
+  worker = await Tesseract.createWorker("eng", 1, {
+    workerPath: baza + "worker.min.js",
+    corePath: baza + "core/",
+    langPath: baza + "lang",
+    workerBlobURL: false,
+    logger: (m) => {
+      if (typeof m.progress === "number") $("postep").firstElementChild.style.width = Math.round(m.progress * 100) + "%";
+    }
+  });
+  await worker.setParameters({
+    tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_/",
+    user_defined_dpi: "300"
+  });
+  $("postep").hidden = true;
+  return worker;
+}
+
+/* wycinek -> powiekszony, czarno-bialy, bez linii tabeli (bez tego OCR czyta kreski jako litery) */
+function przygotuj(zrodlo, x, y, w, h){
+  const skala = Math.min(4, Math.max(1, 1600 / w));
+  const c = document.createElement("canvas");
+  c.width = Math.round(w * skala); c.height = Math.round(h * skala);
+  const g = c.getContext("2d", {willReadFrequently:true});
+  g.imageSmoothingQuality = "high";
+  g.drawImage(zrodlo, x, y, w, h, 0, 0, c.width, c.height);
+  const img = g.getImageData(0, 0, c.width, c.height), d = img.data, n = c.width * c.height;
+  const szary = new Uint8Array(n), hist = new Uint32Array(256);
+  for (let i = 0; i < n; i++){ const v = (d[4*i]*299 + d[4*i+1]*587 + d[4*i+2]*114) / 1000 | 0; szary[i] = v; hist[v]++; }
+  // prog Otsu
+  let suma = 0; for (let i = 0; i < 256; i++) suma += i * hist[i];
+  let sB = 0, wB = 0, best = 0, prog = 128;
+  for (let i = 0; i < 256; i++){
+    wB += hist[i]; if (!wB) continue; const wF = n - wB; if (!wF) break;
+    sB += i * hist[i]; const mB = sB / wB, mF = (suma - sB) / wF, v = wB * wF * (mB - mF) ** 2;
+    if (v > best){ best = v; prog = i; }
+  }
+  const ciemny = new Uint8Array(n);
+  for (let i = 0; i < n; i++) ciemny[i] = szary[i] < prog ? 1 : 0;
+  // usun dlugie poziome i pionowe kreski
+  const W = c.width, H = c.height, dl = Math.max(40, W * 0.08) | 0;
+  const zmaz = new Uint8Array(n);
+  for (let yy = 0; yy < H; yy++){ let bieg = 0;
+    for (let xx = 0; xx <= W; xx++){
+      if (xx < W && ciemny[yy*W+xx]) bieg++;
+      else { if (bieg >= dl) for (let k = xx - bieg; k < xx; k++) for (let o = -2; o <= 2; o++){ const yo = yy+o; if (yo>=0 && yo<H) zmaz[yo*W+k] = 1; } bieg = 0; }
+    } }
+  const dlP = Math.max(30, H * 0.7) | 0;
+  for (let xx = 0; xx < W; xx++){ let bieg = 0;
+    for (let yy = 0; yy <= H; yy++){
+      if (yy < H && ciemny[yy*W+xx]) bieg++;
+      else { if (bieg >= dlP) for (let k = yy - bieg; k < yy; k++) for (let o = -2; o <= 2; o++){ const xo = xx+o; if (xo>=0 && xo<W) zmaz[k*W+xo] = 1; } bieg = 0; }
+    } }
+  for (let i = 0; i < n; i++){ const v = ciemny[i] && !zmaz[i] ? 0 : 255; d[4*i] = d[4*i+1] = d[4*i+2] = v; d[4*i+3] = 255; }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+
+async function czytajLinie(zrodlo, x, y, w, h){
+  const ocr = await czytnik();
+  const c = przygotuj(zrodlo, x, y, w, h);
+  await ocr.setParameters({tessedit_pageseg_mode: "7"});
+  const {data} = await ocr.recognize(c, {}, {text: true, blocks: true});
+  // ostatnie albo pierwsze slowo przy samej krawedzi = kod mogl zostac uciety
+  const slowa = [];
+  for (const b of data.blocks || []) for (const p of b.paragraphs || []) for (const l of p.lines || []) for (const w of l.words || []) if (w.text.trim()) slowa.push(w);
+  const brzeg = c.width * 0.02;
+  const uciety = slowa.length > 0 && (slowa[slowa.length - 1].bbox.x1 > c.width - brzeg || slowa[0].bbox.x0 < brzeg);
+  return {tekst: data.text.trim(), podglad: c.toDataURL("image/png"), uciety};
+}
+
+/* Kartka rzadko lezy idealnie prosto. Krzywe linie tabeli przecinaja wtedy
+   tekst i myla OCR. Szukamy kata, przy ktorym wiersze sa najbardziej „ostre"
+   (najwieksza wariancja sum ciemnych pikseli w wierszach), i prostujemy. */
+function wyprostuj(c){
+  const W = 480, sk = W / c.width, H = Math.max(8, Math.round(c.height * sk));
+  const m = document.createElement("canvas"); m.width = W; m.height = H;
+  const g = m.getContext("2d", {willReadFrequently: true}); g.drawImage(c, 0, 0, W, H);
+  const d = g.getImageData(0, 0, W, H).data, n = W * H, szary = new Uint8Array(n), hist = new Uint32Array(256);
+  for (let i = 0; i < n; i++){ const v = (d[4*i]*299 + d[4*i+1]*587 + d[4*i+2]*114) / 1000 | 0; szary[i] = v; hist[v]++; }
+  let suma = 0; for (let i = 0; i < 256; i++) suma += i * hist[i];
+  let sB = 0, wB = 0, best = 0, prog = 128;
+  for (let i = 0; i < 256; i++){ wB += hist[i]; if (!wB) continue; const wF = n - wB; if (!wF) break;
+    sB += i * hist[i]; const v = wB * wF * (sB / wB - (suma - sB) / wF) ** 2; if (v > best){ best = v; prog = i; } }
+  const xs = [], ys = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (szary[y*W + x] < prog){ xs.push(x); ys.push(y); }
+  let najKat = 0, najWar = -1;
+  for (let k = -7; k <= 7.001; k += 0.5){
+    const tg = Math.tan(k * Math.PI / 180), h2 = new Float64Array(H + 2 * W);
+    for (let i = 0; i < xs.length; i++){ const yy = Math.round(ys[i] - xs[i] * tg) + W; if (yy >= 0 && yy < h2.length) h2[yy]++; }
+    let s1 = 0, s2 = 0; for (const v of h2){ s1 += v; s2 += v * v; }
+    const war = s2 - s1 * s1 / h2.length;
+    if (war > najWar){ najWar = war; najKat = k; }
+  }
+  if (Math.abs(najKat) < 0.25) return c;
+  const r = document.createElement("canvas"); r.width = c.width; r.height = c.height;
+  const gg = r.getContext("2d"); gg.fillStyle = "#fff"; gg.fillRect(0, 0, r.width, r.height);
+  gg.translate(r.width / 2, r.height / 2); gg.rotate(-najKat * Math.PI / 180); gg.drawImage(c, -c.width / 2, -c.height / 2);
+  return r;
+}
+
+/* Szukanie kodu w obszarze (ramka z aparatu albo cale zdjecie):
+   1) prostujemy obszar i czytamy go „luzem", szukajac linii z nazwa mebla,
+   2) najlepsze linie czytamy jeszcze raz z bliska, w kilku szerokosciach,
+      bo OCR czesto dzieli jedna linie kodu na kawalki. Wygrywa odczyt,
+      z ktorego najwiecej bryl pasuje do cennika; przy remisie — dluzszy. */
+async function szukaj(zrodlo, x, y, w, h){
+  const ocr = await czytnik();
+  const s = Math.min(3, Math.max(0.6, 2200 / Math.max(w, h)));
+  let c = document.createElement("canvas");
+  c.width = Math.round(w * s); c.height = Math.round(h * s);
+  const g = c.getContext("2d"); g.imageSmoothingQuality = "high";
+  g.drawImage(zrodlo, x, y, w, h, 0, 0, c.width, c.height);
+  c = wyprostuj(c);
+  const W = c.width, H = c.height;
+  await ocr.setParameters({tessedit_pageseg_mode: "11"});
+  const {data} = await ocr.recognize(c, {}, {blocks: true, text: true});
+  const linie = [];
+  for (const bl of data.blocks || []) for (const p of bl.paragraphs || []) for (const l of p.lines || []) linie.push(l);
+  const kandydaci = linie.map((l) => ({l, d: dopasuj(l.text)})).filter((k) => k.d && k.d.mebel)
+    .sort((p, q) => punkty(q.d) - punkty(p.d)).slice(0, 3);
+  let najlepszy = null;
+  const lepszy = (o) => {
+    if (!najlepszy) { najlepszy = o; return; }
+    const a = punkty(o.d), b = punkty(najlepszy.d);
+    if (a > b || (a === b && (o.d?.tekst || "").length > (najlepszy.d?.tekst || "").length)) najlepszy = o;
+  };
+  for (const {l, d} of kandydaci){
+    const bb = l.bbox, wys = bb.y1 - bb.y0;
+    const y0 = Math.max(0, bb.y0 - 0.6 * wys), y1 = Math.min(H, bb.y1 + 0.6 * wys);
+    const zapas = 0.04 * W;
+    const okna = [
+      [Math.max(0, bb.x0 - zapas), Math.min(W, bb.x1 + zapas)],
+      [Math.max(0, bb.x0 - zapas), W],
+      [0, W],
+    ];
+    lepszy({tekst: l.text.trim(), podglad: null, d});
+    for (const [x0, x1] of okna){
+      const r = await czytajLinie(c, x0, y0, x1 - x0, y1 - y0);
+      lepszy({...r, d: dopasuj(r.tekst)});
+    }
+  }
+  return najlepszy;
+}
+
+/* ================= APARAT ================= */
+let strumien = null;
+$("btn-aparat").addEventListener("click", async () => {
+  try{
+    strumien = await navigator.mediaDevices.getUserMedia({video: {facingMode: {ideal: "environment"}, width: {ideal: 1920}, height: {ideal: 1440}}, audio: false});
+  }catch(e){
+    stan("Brak dostępu do aparatu. Zezwól na aparat w ustawieniach przeglądarki albo użyj „Zdjęcie kartki”.");
+    return;
+  }
+  const v = $("wideo");
+  v.srcObject = strumien; v.hidden = false; $("zdjecie").hidden = true;
+  await v.play().catch(() => {});
+  $("zaslona").hidden = true; $("ramka").hidden = false; $("btn-skanuj").disabled = false;
+  czytnik().then(() => stan("Gotowe. Ustaw kod w ramce i naciśnij „Skanuj”.")).catch(() => stan("Nie udało się wczytać czytnika tekstu."));
+});
+
+/* przelicz ramke z ekranu na piksele obrazu z aparatu (wideo jest przyciete przez object-fit: cover) */
+function ramkaWObrazie(v){
+  const box = $("kamera").getBoundingClientRect(), r = $("ramka").getBoundingClientRect();
+  const vw = v.videoWidth, vh = v.videoHeight;
+  const s = Math.max(box.width / vw, box.height / vh);
+  const ox = (box.width - vw * s) / 2, oy = (box.height - vh * s) / 2;
+  const x = (r.left - box.left - ox) / s, y = (r.top - box.top - oy) / s;
+  const w = r.width / s, h = r.height / s;
+  return [Math.max(0, x), Math.max(0, y), Math.min(vw - x, w), Math.min(vh - y, h)];
+}
+
+$("btn-skanuj").addEventListener("click", async () => {
+  const v = $("wideo"); if (!v.videoWidth) return;
+  $("btn-skanuj").disabled = true; stan("Czytam…");
+  try{
+    await gotowyCennik;
+    const klatka = document.createElement("canvas");
+    klatka.width = v.videoWidth; klatka.height = v.videoHeight;
+    klatka.getContext("2d").drawImage(v, 0, 0);
+    const [rx, ry, rw, rh] = ramkaWObrazie(v);
+    const y0 = Math.max(0, ry - rh * 0.5), y1 = Math.min(klatka.height, ry + rh * 1.5);
+    let r = await szukaj(klatka, rx, y0, rw, y1 - y0);
+    if (!r || punkty(r.d) < 2){                         // w ramce nic sensownego — szukamy na calej klatce
+      stan("W ramce nie widzę kodu, szukam na całym obrazie…");
+      const z = await szukaj(klatka, 0, 0, klatka.width, klatka.height);
+      if (z && (!r || punkty(z.d) > punkty(r.d))) r = z;
+    }
+    pokaz(r || {tekst: "", d: null});
+  }catch(e){ stan("Coś poszło nie tak przy czytaniu: " + (e && e.message || e)); }
+  $("btn-skanuj").disabled = false;
+});
+
+$("plik").addEventListener("change", async (e) => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  e.target.value = "";
+  stan("Czytam zdjęcie…");
+  try{
+    await gotowyCennik;
+    const bm = await createImageBitmap(f, {imageOrientation: "from-image"});
+    const c = document.createElement("canvas"); c.width = bm.width; c.height = bm.height;
+    c.getContext("2d").drawImage(bm, 0, 0);
+    $("zdjecie").src = c.toDataURL("image/jpeg", 0.8); $("zdjecie").hidden = false;
+    $("zaslona").hidden = true; $("ramka").hidden = true;
+    if (strumien){ strumien.getTracks().forEach((t) => t.stop()); strumien = null; $("wideo").hidden = true; $("btn-skanuj").disabled = true; }
+    const r = await szukaj(c, 0, 0, c.width, c.height);
+    if (!r){ pokaz({tekst: "", d: null}); return; }
+    pokaz(r);
+  }catch(err){ stan("Nie udało się odczytać zdjęcia: " + (err && err.message || err)); }
+});
+
+$("form-kod").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await gotowyCennik;
+  const t = $("kod").value;
+  pokaz({tekst: t, d: dopasuj(t), recznie: true});
+});
+
+/* ================= WYNIK ================= */
+let biezacy = null;
+function pokaz(r){
+  biezacy = r;
+  const d = r.d;
+  const box = $("wynik");
+  if (!d || !d.mebel){
+    stan("");
+    box.innerHTML = `<div class="wynik"><h2>Nie znalazłem kodu</h2>
+      ${r.tekst ? `<div class="odczyt">Odczytano: ${esc(r.tekst)}</div>` : ""}
+      <div class="info">Ustaw w ramce samą linię z kodem modelu (np. KORFU-OTTGL-ECEL…), trzymaj telefon prosto i bez cienia, i spróbuj jeszcze raz.</div>
+      ${r.podglad ? `<details><summary>Co widział skaner</summary><img src="${r.podglad}" alt="Wycinek przeczytany przez skaner"></details>` : ""}</div>`;
+    return;
+  }
+  // zlicz powtorzone bryly
+  const lista = [];
+  for (const p of d.pozycje){
+    const jest = p.kod && lista.find((x) => x.kod === p.kod && x.status !== "brak");
+    if (jest){ jest.q++; continue; }
+    lista.push({...p, q: 1, wybrana: p.status !== "brak" && !p.mozeUciete});
+  }
+  biezacy.lista = lista;
+  const bryly = CENNIK[d.mebel];
+  const opcje = bryly.map((b) => `<option value="${esc(b[0])}">${esc(b[0])}</option>`).join("");
+  const wiersze = lista.map((p, i) => {
+    let opis, sel = "";
+    if (p.mozeUciete){
+      opis = `<span class="chip popr">koniec kodu mógł zostać ucięty — na kartce jest ${esc(p.kod.slice(p.kod.indexOf("-") + 1))}? Zaznacz albo wybierz inną</span>`;
+      const pierwsze = [p.kod, ...p.dluzsze];
+      const reszta = bryly.map((b) => b[0]).filter((k) => !pierwsze.includes(k));
+      sel = `<select data-i="${i}" aria-label="Wybierz bryłę"><option value="${esc(p.kod)}">${esc(p.kod)}</option>`
+        + p.dluzsze.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join("")
+        + `<option disabled>──────────</option>` + reszta.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join("") + `</select>`;
+    }
+    else if (p.status === "ok") opis = `<span class="chip ok">✓ zgodna z cennikiem</span>`;
+    else if (p.status === "popr") opis = `<span class="chip popr">${p.sklejone ? "rozdzielone" : "poprawione"} · odczytano „${esc(p.odczyt)}”${p.sprawdz ? " — sprawdź" : ""}</span>`;
+    else {
+      opis = `<span class="chip brak">nie rozpoznano „${esc(p.odczyt)}”${p.powod ? " (" + esc(p.powod) + ")" : ""} — wybierz</span>`;
+      sel = `<select data-i="${i}" aria-label="Wybierz bryłę zamiast ${esc(p.odczyt)}"><option value="">— wybierz bryłę —</option>${opcje}</select>`;
+    }
+    return `<div class="bryla">
+      <input type="checkbox" data-i="${i}" ${p.wybrana ? "checked" : ""} ${p.kod ? "" : "disabled"} aria-label="Zaznacz ${esc(p.kod || p.odczyt)}">
+      <span class="kod">${esc(p.kod || "?")}${p.q > 1 ? ` ×${p.q}` : ""}</span>
+      <span class="cena">${p.kod && p.cena != null ? zl(p.cena * p.q) : "—"}</span>
+      <span class="opis">${opis}</span>${sel}</div>`;
+  }).join("");
+  const nP = lista.filter((p) => p.status !== "ok" || p.mozeUciete).length;
+  stan(`Rozpoznano ${lista.length} ${odm(lista.length,"bryłę","bryły","brył")}` + (nP ? `, ${nP} ${odm(nP,"wymaga","wymagają","wymaga")} spojrzenia.` : "."));
+  box.innerHTML = `<div class="wynik">
+    <h2>${esc(d.mebel)}</h2>
+    <div class="odczyt">${r.recznie ? "Wpisano" : "Odczytano"}: <b class="caly-kod">${esc(r.tekst)}</b></div>
+    ${r.recznie ? "" : `<div class="${r.uciety ? "uwaga-uciete" : "info"}" style="margin:-4px 0 8px">${r.uciety
+      ? "Kod dochodzi do krawędzi — mógł zostać ucięty. Porównaj z kartką, czy nie brakuje końcówki."
+      : "Porównaj z kartką, czy kod jest cały."}</div>`}
+    ${wiersze}
+    <div class="suma"><span>Tapicerowanie razem</span><b id="suma">0,00 zł</b></div>
+    <div class="rzad"><button class="btn btn-glowny" id="btn-zatwierdz">Zatwierdź</button></div>
+    ${r.podglad ? `<details><summary>Co widział skaner</summary><img src="${r.podglad}" alt="Wycinek przeczytany przez skaner"></details>` : ""}
+    <div id="gotowe"></div></div>`;
+  przelicz();
+  box.querySelectorAll("input[type=checkbox]").forEach((c) => c.addEventListener("change", () => { lista[+c.dataset.i].wybrana = c.checked; przelicz(); }));
+  box.querySelectorAll("select").forEach((s) => s.addEventListener("change", () => {
+    const p = lista[+s.dataset.i], b = bryly.find((x) => x[0] === s.value);
+    if (!b){ p.kod = null; p.wybrana = false; } else { p.kod = b[0]; p.cena = b[1]; p.wybrana = true; p.status = "recznie"; }
+    if (b && p.mozeUciete) wiersz0(s).querySelector(".opis").innerHTML = `<span class="chip ok">wybrano ręcznie</span>`;
+    const wiersz = s.closest(".bryla");
+    wiersz.querySelector(".kod").textContent = p.kod || "?";
+    wiersz.querySelector(".cena").textContent = p.kod && p.cena != null ? zl(p.cena * p.q) : "—";
+    const cb = wiersz.querySelector("input[type=checkbox]"); cb.disabled = !p.kod; cb.checked = p.wybrana;
+    przelicz();
+  }));
+  $("btn-zatwierdz").addEventListener("click", () => {
+    const wyb = lista.filter((p) => p.wybrana && p.kod);
+    const s = wyb.reduce((a, p) => a + doGroszy((p.cena || 0) * p.q), 0);
+    $("gotowe").innerHTML = wyb.length
+      ? `<div class="gotowe"><b>Zatwierdzone (test).</b> W aplikacji do dziennika poszłoby:<br>
+         <span style="font-family:var(--mono)">${esc(d.mebel)} — ${wyb.map((p) => esc(p.kod.includes("-") ? p.kod.slice(p.kod.indexOf("-")+1) : p.kod) + (p.q > 1 ? " ×" + p.q : "")).join(", ")}</span><br>
+         razem <b>${zl(s)}</b></div>`
+      : `<div class="gotowe">Nic nie jest zaznaczone.</div>`;
+  });
+  box.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
+}
+const wiersz0 = (el) => el.closest(".bryla");
+function przelicz(){
+  const s = (biezacy.lista || []).filter((p) => p.wybrana && p.kod).reduce((a, p) => a + doGroszy((p.cena || 0) * p.q), 0);
+  if ($("suma")) $("suma").textContent = zl(s);
+}
+</script>
+</body>
+</html>
